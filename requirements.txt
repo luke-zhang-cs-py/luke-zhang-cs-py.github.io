@@ -1,0 +1,4 @@
+# what tests/ and tools/ need; the site itself needs nothing
+playwright
+pillow
+coverage

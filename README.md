@@ -35,7 +35,7 @@ Double-click `index.html`. It's plain HTML and CSS with a little JavaScript: no 
 ## Checks
 
 ```bash
-pip install playwright && python -m playwright install chromium
+pip install -r requirements.txt && python -m playwright install chromium
 python tests/check_site.py        # 35 checks in a real browser (--offline skips the 3 that need the network)
 python tests/check_site.py --coverage coverage.html   # plus which lines of JS and CSS rules ran
 python tools/record_demo.py       # re-record docs/demo.gif from the live site

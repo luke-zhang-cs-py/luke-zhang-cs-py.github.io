@@ -14,6 +14,6 @@ jobs:
           python-version: "3.12"
       - name: Browser checks (structure, demos, layout, dark mode, links, privacy)
         run: |
-          pip install playwright
+          pip install -r requirements.txt
           python -m playwright install --with-deps chromium
           python tests/check_site.py
