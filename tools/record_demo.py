@@ -1,6 +1,6 @@
 """Records docs/demo.gif from the live site.
 
-    python tools/record_demo.py [url]      (default: the published site)
+    python tools/record_demo.py [url] [--out file.gif]      (default: the published site, docs/demo.gif)
 
 One browser, real waits: the page loads, scrolls from the introduction through the
 projects (pausing on each so its own demo GIF plays), switches to dark mode, and
@@ -11,9 +11,13 @@ import io, pathlib, sys
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
-URL = sys.argv[1] if len(sys.argv) > 1 else "https://luke-zhang-cs-py.github.io/"
-OUT = pathlib.Path(__file__).resolve().parent.parent / "docs" / "demo.gif"
+args = sys.argv[1:]
+OUT = pathlib.Path(args.pop(args.index("--out") + 1)) if "--out" in args else pathlib.Path(__file__).resolve().parent.parent / "docs" / "demo.gif"
+args = [a for a in args if a != "--out"]
+URL = args[0] if args else "https://luke-zhang-cs-py.github.io/"
 SIZE = (880, 550)
+HOLD_MS = {"intro": 1600, "section": 1300, "theme": 1200, "end": 2000}   # how long each still is shown
+DEMO_FRAMES, DEMO_FRAME_MS = 4, 300    # frames captured on each project, so its own demo is seen playing
 frames = []   # (image, ms)
 
 def grab(pg, ms):
@@ -45,16 +49,16 @@ with sync_playwright() as pw:
     pg.wait_for_function("[...document.querySelectorAll('.shot img')].every(i => i.complete && i.naturalWidth)", timeout=90000)
     pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(600)
 
-    grab(pg, 1600)                                  # the introduction
-    glide(pg, top_of(pg, "#about")); dwell(pg, 1, 1300)
-    for pid in ("#transit", "#almanac", "#chess"):  # three projects, their GIFs playing
-        glide(pg, top_of(pg, pid, 90)); dwell(pg, 4, 300)
-    pg.click("#themeBtn"); pg.wait_for_timeout(300)  # dark mode
-    grab(pg, 1200)
+    grab(pg, HOLD_MS["intro"])
+    glide(pg, top_of(pg, "#about")); dwell(pg, 1, HOLD_MS["section"])
+    for pid in ("#transit", "#almanac", "#chess"):
+        glide(pg, top_of(pg, pid, 90)); dwell(pg, DEMO_FRAMES, DEMO_FRAME_MS)
+    pg.click("#themeBtn"); pg.wait_for_timeout(300)
+    grab(pg, HOLD_MS["theme"])
     for pid in ("#faces", "#spam", "#tally"):
-        glide(pg, top_of(pg, pid, 90)); dwell(pg, 4, 300)
-    glide(pg, top_of(pg, "#skills")); dwell(pg, 1, 1300)
-    glide(pg, pg.evaluate("document.body.scrollHeight - innerHeight")); dwell(pg, 1, 2000)
+        glide(pg, top_of(pg, pid, 90)); dwell(pg, DEMO_FRAMES, DEMO_FRAME_MS)
+    glide(pg, top_of(pg, "#skills")); dwell(pg, 1, HOLD_MS["section"])
+    glide(pg, pg.evaluate("document.body.scrollHeight - innerHeight")); dwell(pg, 1, HOLD_MS["end"])
     b.close()
 
 OUT.parent.mkdir(exist_ok=True)

@@ -36,7 +36,8 @@ Double-click `index.html`. It's plain HTML and CSS with a little JavaScript: no 
 
 ```bash
 pip install playwright && python -m playwright install chromium
-python tests/check_site.py        # 21 checks in a real browser
+python tests/check_site.py        # 35 checks in a real browser (--offline skips the 3 that need the network)
+python tests/check_site.py --coverage coverage.html   # plus which lines of JS and CSS rules ran
 python tools/record_demo.py       # re-record docs/demo.gif from the live site
 python tools/make_og.py           # re-render og.png, the link-preview image
 ```
@@ -48,6 +49,10 @@ python tools/make_og.py           # re-render og.png, the link-preview image
 - dark mode and that it's remembered;
 - reduced motion;
 - the link-preview tags;
+- the nav following the scroll and the links clicked;
+- print;
+- that the figures on the page add up, and each appears in its project's own README;
+- that the W3C validator finds no errors;
 - that every outbound link answers.
 
 It also guards privacy: it fails if the phone number from the resume appears anywhere in the site. The number itself is stored only as a hash.
