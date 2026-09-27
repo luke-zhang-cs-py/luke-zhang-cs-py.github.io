@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luke Zhang · Software Engineering Portfolio</title>
+<meta name="description" content="Luke Zhang, Computer Science and Business Administration student at Northeastern University. Backend, data and machine-learning projects, each with a live demo: transit routing, a booking platform, a chess engine, face recognition, a spam classifier and an expense tracker.">
+<meta name="author" content="Luke Zhang">
+<link rel="canonical" href="https://luke-zhang-cs-py.github.io/">
+<meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F8FAFC" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Luke Zhang · Software Engineering Portfolio">
+<meta property="og:description" content="Backend, data and machine-learning projects, each with a live demo that runs in the browser.">
+<meta property="og:url" content="https://luke-zhang-cs-py.github.io/">
+<meta property="og:image" content="https://luke-zhang-cs-py.github.io/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Luke Zhang",
+  "url": "https://luke-zhang-cs-py.github.io/",
+  "jobTitle": "Computer Science and Business Administration student",
+  "alumniOf": [{"@type": "CollegeOrUniversity", "name": "Northeastern University"}, {"@type": "CollegeOrUniversity", "name": "Queen's University Belfast"}],
+  "knowsAbout": ["Python", "Java", "JavaScript", "SQL", "Flask", "REST APIs", "PostgreSQL", "scikit-learn", "OpenCV"],
+  "sameAs": ["https://github.com/luke-zhang-cs-py", "https://www.linkedin.com/in/luke-zhang-nu/"]
+}
+</script>
+<script>
+  // Theme before first paint, so a dark-mode visitor never sees a white flash.
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) { /* storage blocked */ }
+    var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  })();
+</script>
+<style>
+  :root{
+    --bg:#F8FAFC; --surface:#FFFFFF; --surface-2:#F1F5F9; --text:#0F172A; --muted:#475569; --faint:#64748B;
+    --line:#E2E8F0; --accent:#0F766E; --accent-strong:#115E59; --accent-wash:#CCFBF1; --on-accent:#FFFFFF;
+    --shadow:0 1px 2px rgba(15,23,42,.06),0 12px 32px -16px rgba(15,23,42,.25);
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Consolas,monospace;
+    color-scheme:light;
+  }
+  [data-theme="dark"]{
+    --bg:#0B1220; --surface:#111A2E; --surface-2:#16213A; --text:#E2E8F0; --muted:#A3B1C6; --faint:#8494AB;
+    --line:#22304A; --accent:#2DD4BF; --accent-strong:#5EEAD4; --accent-wash:#0F3B3A; --on-accent:#042F2E;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -18px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:76px}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-underline-offset:3px}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+  .skip{position:absolute;left:-9999px;top:8px;background:var(--accent);color:var(--on-accent);padding:8px 14px;border-radius:6px;z-index:10}
+  .skip:focus{left:12px}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  section{padding:88px 0 0}
+  .eyebrow{font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  h2.title{font-size:clamp(1.7rem,3vw,2.2rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 28px}
+
+  /* header */
+  .bar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .bar .wrap{display:flex;align-items:center;gap:22px;height:60px}
+  .brand{font-weight:700;text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+  .brand span{color:var(--accent)}
+  .bar nav{display:flex;gap:22px;flex:1;overflow-x:auto;scrollbar-width:none}
+  .bar nav::-webkit-scrollbar{display:none}
+  .bar nav a{font-size:.92rem;color:var(--muted);text-decoration:none;white-space:nowrap}
+  .bar nav a:hover,.bar nav a[aria-current="true"]{color:var(--text)}
+  .bar nav a[aria-current="true"]{box-shadow:inset 0 -2px var(--accent)}
+  .spacer{flex:1}
+  .icon-btn{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;flex:none}
+  .icon-btn svg{width:18px;height:18px}
+  [data-theme="dark"] .moon,[data-theme="light"] .sun{display:none}
+  @media (max-width:720px){ .bar nav{display:none} }
+  @media (min-width:721px){ .spacer{display:none} }
+
+  /* hero */
+  .hero{padding:96px 0 24px}
+  .hero h1{font-size:clamp(2.6rem,6.4vw,4.4rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 18px}
+  .hero .role{font-size:clamp(1.1rem,2vw,1.35rem);color:var(--muted);margin:0 0 22px;max-width:46ch}
+  .hero .role strong{color:var(--text);font-weight:600}
+  .hero .lede{max-width:62ch;color:var(--muted);margin:0 0 30px}
+  .cta{display:flex;flex-wrap:wrap;gap:12px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;font-weight:600;font-size:.95rem;text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--text);transition:border-color .15s,background .15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+  .btn.primary:hover{background:var(--accent-strong)}
+  .btn svg{width:17px;height:17px;flex:none}
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:56px 0 0}
+  .stats div{background:var(--surface);padding:18px 20px}
+  .stats b{display:block;font-size:1.7rem;letter-spacing:-.02em}
+  .stats span{font-size:.86rem;color:var(--muted)}
+  @media (max-width:720px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+  /* about */
+  .about{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:48px}
+  .about p{margin:0 0 14px;color:var(--muted)}
+  .about p strong{color:var(--text)}
+  .focus{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .focus li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .focus b{display:block;font-size:.95rem}
+  .focus span{font-size:.88rem;color:var(--muted)}
+  @media (max-width:860px){ .about{grid-template-columns:minmax(0,1fr);gap:24px} }
+
+  /* projects */
+  .projects{display:grid;gap:28px}
+  .project{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+  .project.flip .shot{order:2}
+  .project.tall{grid-template-columns:minmax(0,.7fr) minmax(0,1fr)}
+  .shot{background:var(--surface-2);padding:22px;display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .shot img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+  .project.tall .shot img,.project.tall .play{max-width:300px;margin:0 auto}
+  .play{display:none;width:100%;aspect-ratio:var(--ratio);border:1px dashed var(--line);border-radius:10px;background:var(--surface);color:var(--text);font:600 .95rem var(--sans);cursor:pointer}
+  .reduced .play:not([hidden]){display:block}
+  .body{padding:30px 32px 32px}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 6px;font-family:var(--mono);font-size:.8rem;color:var(--faint)}
+  .meta .kind{color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+  .project h3{font-size:1.5rem;letter-spacing:-.02em;margin:0 0 10px;line-height:1.2}
+  .project .pitch{margin:0 0 16px;color:var(--muted)}
+  .project ul.points{margin:0 0 18px;padding-left:18px}
+  .project ul.points li{margin:0 0 7px}
+  .impact{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:0;list-style:none}
+  .impact li{background:var(--accent-wash);color:var(--text);border-radius:8px;padding:5px 10px;font-size:.85rem}
+  .impact b{font-family:var(--mono)}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px;padding:0;list-style:none}
+  .tags li{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
+  .links{display:flex;flex-wrap:wrap;gap:10px}
+  .links .btn{padding:9px 14px;font-size:.9rem}
+  @media (max-width:900px){
+    .project,.project.flip,.project.tall{grid-template-columns:minmax(0,1fr)}
+    .project.flip .shot{order:0}
+    .body{padding:24px 22px 26px}
+  }
+
+  /* skills */
+  .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+  .skill{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .skill h3{font-size:.95rem;margin:0 0 12px}
+  .skill ul{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+  .skill li{font-size:.86rem;background:var(--surface-2);border-radius:6px;padding:4px 9px}
+
+  /* education */
+  .schools{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .school{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+  .school h3{margin:0 0 4px;font-size:1.1rem}
+  .school .deg{margin:0 0 8px;color:var(--muted)}
+  .school time,.school .where{font-family:var(--mono);font-size:.82rem;color:var(--faint)}
+  .school p.more{margin:10px 0 0;font-size:.9rem;color:var(--muted)}
+
+  /* contact */
+  .contact{margin:88px 0 0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:40px;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+  .contact h2{margin:0 0 6px;font-size:1.6rem;letter-spacing:-.02em}
+  .contact p{margin:0;color:var(--muted);max-width:52ch}
+  footer{padding:36px 0 56px;color:var(--faint);font-size:.86rem}
+  footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
+
+  @media (max-width:520px){ .contact{padding:28px 22px} .shot{padding:14px} }
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} .btn{transition:none} }
+  @media print{
+    .bar,.shot,.cta,.links{display:none}
+    .project{grid-template-columns:1fr;box-shadow:none;break-inside:avoid}
+    section{padding-top:24px}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top">Luke Zhang<span>.</span></a>
+    <nav aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#education">Education</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to dark theme">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap">
+
+    <!-- hero -->
+    <div class="hero" id="top">
+      <p class="eyebrow">Software engineering portfolio</p>
+      <h1>Luke Zhang</h1>
+      <p class="role"><strong>Computer Science and Business Administration</strong> at Northeastern University. Backend, data and machine learning.</p>
+      <p class="lede">I build systems that can show their working: every project below has a live demo that runs in your browser, a write-up of how it works and what went wrong, and a test suite that checks its own published numbers.</p>
+      <div class="cta">
+        <a class="btn primary" href="#projects">View projects</a>
+        <a class="btn" href="https://github.com/luke-zhang-cs-py" rel="me">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+          GitHub</a>
+        <a class="btn" href="https://www.linkedin.com/in/luke-zhang-nu/" rel="me">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
+          LinkedIn</a>
+        <a class="btn" href="mailto:zhang.l17@northeastern.edu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          Email</a>
+      </div>
+      <div class="stats" aria-label="At a glance">
+        <div><b>6</b><span>open-source projects</span></div>
+        <div><b>6</b><span>live demos, no install</span></div>
+        <div><b>1,571</b><span>automated tests and checks</span></div>
+        <div><b>MIT</b><span>licensed, CI on every push</span></div>
+      </div>
+    </div>
+
+    <!-- about -->
+    <section id="about" aria-labelledby="aboutTitle">
+      <p class="eyebrow">About</p>
+      <h2 class="title" id="aboutTitle">Engineering that can be checked</h2>
+      <div class="about">
+        <div>
+          <p>I'm a first-year <strong>Computer Science and Business Administration</strong> student starting at Northeastern University in January 2027 on a Dean's Scholarship, after a semester at Queen's University Belfast.</p>
+          <p>My work sits where software meets measurement: <strong>routing and search</strong>, <strong>backend systems</strong>, and <strong>machine learning</strong> that has been benchmarked for fairness. Each project ships with a test suite, a browser demo and an honest account of its limits.</p>
+          <p>I'm looking for <strong>Summer 2027 internships</strong> in software engineering, AI/ML or data.</p>
+        </div>
+        <ul class="focus">
+          <li><b>Backend and APIs</b><span>Flask REST APIs, JWT and role-based access, relational schema design</span></li>
+          <li><b>Data and evaluation</b><span>pandas pipelines, reproducible benchmarks, statistical agreement</span></li>
+          <li><b>Machine learning and vision</b><span>scikit-learn, OpenCV, fairness benchmarking</span></li>
+          <li><b>Algorithms</b><span>shortest paths, game-tree search, scheduling</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- projects -->
+    <section id="projects" aria-labelledby="projTitle">
+      <p class="eyebrow">Projects</p>
+      <h2 class="title" id="projTitle">Selected work</h2>
+      <div class="projects">
+
+        <article class="project" id="transit" aria-labelledby="h-transit">
+          <div class="shot">
+            <img data-src="https://luke-zhang-cs-py.github.io/Toronto-Transit-Distance-Matrix/demo.gif" width="760" height="478" loading="lazy"
+                 alt="Dragging the time filter from 5 to 60 minutes: the reach spreads from a single stop to 247 of them, 30 km out">
+            <button class="play" type="button" style="--ratio:760/478" hidden>▶ Play demo</button>
+          </div>
+          <div class="body">
+            <p class="meta"><span class="kind">Routing · geospatial</span><time>Jul 2026 – Present</time></p>
+            <h3 id="h-transit">Toronto Transit Reach</h3>
+            <p class="pitch">An isochrone map and time-dependent trip planner for Toronto: click anywhere and see how far you can get in 30 minutes, over the TTC's own timetable and live feed.</p>
+            <ul class="points">
+              <li>Shortest-path routing with Dijkstra's algorithm over a weighted multi-modal graph (adjacency list, binary heap).</li>
+              <li>Every wait is labelled by source: the next timetabled departure, half the live observed headway, or a modelled figure.</li>
+              <li>Live service alerts remove closed lines from the graph, so trips route around them.</li>
+              <li>The browser demo is a JavaScript port of the Python search; the build refuses to publish if they disagree at any stop.</li>
+            </ul>
+            <ul class="impact" aria-label="Results"><li><b>516</b> stops verified Python vs JS</li><li><b>220</b> tests · <b>100%</b> coverage</li></ul>
+            <ul class="tags" aria-label="Technologies"><li>Python</li><li>Flask</li><li>REST API</li><li>Leaflet</li><li>GTFS-realtime</li><li>JavaScript</li></ul>
+            <div class="links">
+              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Toronto-Transit-Distance-Matrix/app/">Live demo</a>
+              <a class="btn" href="https://luke-zhang-cs-py.github.io/Toronto-Transit-Distance-Matrix/">Write-up</a>
+              <a class="btn" href="https://github.com/luke-zhang-cs-py/Toronto-Transit-Distance-Matrix">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project flip" id="almanac" aria-labelledby="h-almanac">
+          <div class="shot">
+            <img data-src="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/demo.gif" width="900" height="700" loading="lazy"
+                 alt="Five set-ups running through the same slot engine: a full week, a block that clips one slot, an afternoon blocked off, a day booked solid, and today with the morning gone">
+            <button class="play" type="button" style="--ratio:900/700" hidden>▶ Play demo</button>
+          </div>
+          <div class="body">
+            <p class="meta"><span class="kind">Full stack · scheduling</span><time>Aug 2026 – Present</time></p>
+            <h3 id="h-almanac">Almanac</h3>
+            <p class="pitch">A calendar and the multi-role booking platform behind it: clients book a provider's free slots, and invites become bookings without the guest making an account.</p>
+            <ul class="points">
+              <li>RESTful API with JWT authentication and role-based access control for clients, providers and admins.</li>
+              <li>Relational schema on SQLite or PostgreSQL; a partial unique index and foreign keys prevent double-booking at the database level.</li>
+              <li>Availability computed from recurring weekly hours, blocked dates and bookings; five kinds of email, each sent exactly once.</li>
+              <li>Refuses to start in production with the committed development secret that signs every session.</li>
+            </ul>
+            <ul class="impact" aria-label="Results"><li><b>506</b> tests · <b>100%</b> of 1,952 statements</li><li><b>21</b> scenarios verified Python vs JS</li></ul>
+            <ul class="tags" aria-label="Technologies"><li>Python</li><li>Flask</li><li>JWT</li><li>RBAC</li><li>PostgreSQL</li><li>SQLite</li><li>SMTP</li></ul>
+            <div class="links">
+              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/app/">Live demo</a>
+              <a class="btn" href="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/calendar.html">Blank calendar</a>
+              <a class="btn" href="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/">Write-up</a>
+              <a class="btn" href="https://github.com/luke-zhang-cs-py/Almanac-Main-Full-Stack-Calendar">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project" id="chess" aria-labelledby="h-chess">
+          <div class="shot">
+            <img data-src="https://luke-zhang-cs-py.github.io/Dvoerstky-AI-Chess-Coach/docs/demo.gif" width="960" height="795" loading="lazy"
+                 alt="The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder">
+            <button class="play" type="button" style="--ratio:960/795" hidden>▶ Play demo</button>
+          </div>
+          <div class="body">
+            <p class="meta"><span class="kind">Game engine · search</span><time>Sep 2026 – Present</time></p>
+            <h3 id="h-chess">Dvoretsky Lab</h3>
+            <p class="pitch">A chess training room built from one player's own Lichess games: an opponent that plays like you, drills cut from your mistakes, and Stockfish grading every move.</p>
+            <ul class="points">
+              <li>A chess engine from scratch: 0x88 move generation, alpha-beta with quiescence, a Zobrist transposition table and null-move pruning.</li>
+              <li>A "mirror" opponent that loses centipawns at the player's own rate and answers from their opening repertoire.</li>
+              <li>Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.</li>
+              <li>Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines.</li>
+            </ul>
+            <ul class="impact" aria-label="Results"><li>perft on <b>21</b> positions</li><li><b>+41</b> Elo by SPRT</li><li>about <b>1730</b> against Stockfish and Maia</li></ul>
+            <ul class="tags" aria-label="Technologies"><li>JavaScript</li><li>Web Workers</li><li>Stockfish</li><li>UCI</li><li>Lichess API</li><li>Playwright</li></ul>
+            <div class="links">
+              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Dvoerstky-AI-Chess-Coach/">Live demo</a>
+              <a class="btn" href="https://github.com/luke-zhang-cs-py/Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md">Guide</a>
+              <a class="btn" href="https://github.com/luke-zhang-cs-py/Dvoerstky-AI-Chess-Coach">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project flip" id="faces" aria-labelledby="h-faces">
+          <div class="shot">
+            <img data-src="https://luke-zhang-cs-py.github.io/Facial-Recognition-Software/demo.gif" width="900" height="570" loading="lazy"
+                 alt="A face tracked live: the instruction changes from No face detected to Move closer to Head upright to Ready, then a second person appears and the verdict becomes One person only">
+            <button class="play" type="button" style="--ratio:900/570" hidden>▶ Play demo</button>
+          </div>
+          <div class="body">
+            <p class="meta"><span class="kind">Computer vision · fairness</span><time>Aug 2026 – Present</time></p>
+            <h3 id="h-faces">Face Recognition Attendance</h3>
+            <p class="pitch">A local attendance system: OpenCV reads the webcam, recognises enrolled faces and logs attendance to SQLite. No face data leaves the machine.</p>
+            <ul class="points">
+              <li>Detection, LBPH recognition, liveness checks and quality scoring, with a CLI for register, train, run and report.</li>
+              <li>Benchmarked on all of FairFace: a brightness-based quality gate flagged 38.8% of Black faces against 18.5% of White faces, and was rebuilt to be scale-free.</li>
+              <li>Match thresholds calibrated by gallery size over 4.77 billion impostor pairs, since a fixed cut fails as enrolment grows.</li>
+            </ul>
+            <ul class="impact" aria-label="Results"><li><b>97,698</b> faces benchmarked</li><li>detection <b>99.95%</b></li><li>bias <b>2.15×</b> → <b>1.24×</b></li><li><b>382</b> tests</li></ul>
+            <ul class="tags" aria-label="Technologies"><li>Python</li><li>OpenCV</li><li>Flask</li><li>SQLite</li><li>MediaPipe</li></ul>
+            <div class="links">
+              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Facial-Recognition-Software/camera/">Live demo</a>
+              <a class="btn" href="https://luke-zhang-cs-py.github.io/Facial-Recognition-Software/">Write-up</a>
+              <a class="btn" href="https://github.com/luke-zhang-cs-py/Facial-Recognition-Software">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project" id="spam" aria-labelledby="h-spam">
+          <div class="shot">
+            <img data-src="https://luke-zhang-cs-py.github.io/AI-Spam-Message-Classifier/demo.gif" width="720" height="653" loading="lazy"
+                 alt="Classifying three messages: a lunch text comes back HAM, a prize message SPAM, and a competition text SPAM at 79.1%, with the words ranked by how much each pushed the verdict">
+            <button class="play" type="button" style="--ratio:720/653" hidden>▶ Play demo</button>
+          </div>
+          <div class="body">
+            <p class="meta"><span class="kind">Machine learning · NLP</span><time>Jul 2026 – Present</time></p>
+            <h3 id="h-spam">AI Spam Message Classifier</h3>
+            <p class="pitch">Spam or not, and which words drove the call, with the trained model exported into the page so nothing is uploaded.</p>
+            <ul class="points">
+              <li>TF-IDF over unigrams and bigrams, keeping the kind of each noisy token (links, money, short codes) rather than deleting it.</li>
+              <li>Naive Bayes and logistic regression compared on out-of-fold predictions, so no message is scored by a model that trained on it.</li>
+              <li>Decision threshold chosen for the best F1 with precision held at 0.90, and saved inside the model artifact.</li>
+            </ul>
+            <ul class="impact" aria-label="Results"><li>F1 <b>0.850</b> at precision <b>0.90</b></li><li><b>138</b> tests · <b>100%</b> coverage</li></ul>
+            <ul class="tags" aria-label="Technologies"><li>Python</li><li>scikit-learn</li><li>pandas</li><li>Flask</li><li>JavaScript</li></ul>
+            <div class="links">
+              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/AI-Spam-Message-Classifier/app/">Live demo</a>
+              <a class="btn" href="https://luke-zhang-cs-py.github.io/AI-Spam-Message-Classifier/">Write-up</a>
+              <a class="btn" href="https://github.com/luke-zhang-cs-py/AI-Spam-Message-Classifier">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project flip tall" id="tally" aria-labelledby="h-tally">
+          <div class="shot">
+            <img data-src="https://luke-zhang-cs-py.github.io/tally/demo.gif" width="470" height="903" loading="lazy"
+                 alt="Tapping 3, 5, 0 so the amount shifts in from the right as 3.50, choosing Coffee, saving, then a second entry, the day's total climbing to 15.90 euros">
+            <button class="play" type="button" style="--ratio:470/903" hidden>▶ Play demo</button>
+          </div>
+          <div class="body">
+            <p class="meta"><span class="kind">Mobile-first · product</span><time>Sep 2026</time></p>
+            <h3 id="h-tally">Tally</h3>
+            <p class="pitch">A phone-first expense tracker for the seconds after you spend: tap an amount, tap a category, done.</p>
+            <ul class="points">
+              <li>A till-style keypad: digits shift in from the right, so there is no decimal point to place.</li>
+              <li>Anything bought three or more times in 90 days becomes a one-tap button carrying its amount and category.</li>
+              <li>Money stored as integer cents, and currencies never summed without a rate.</li>
+              <li>Local only: no account, no bank connection; exports CSV for reconciliation.</li>
+            </ul>
+            <ul class="impact" aria-label="Results"><li><b>2</b> taps for a regular purchase</li><li><b>145</b> tests</li></ul>
+            <ul class="tags" aria-label="Technologies"><li>Python</li><li>Flask</li><li>SQLite</li><li>JavaScript</li></ul>
+            <div class="links">
+              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/tally/app/">Live demo</a>
+              <a class="btn" href="https://luke-zhang-cs-py.github.io/tally/">Write-up</a>
+              <a class="btn" href="https://github.com/luke-zhang-cs-py/tally">Source</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- skills -->
+    <section id="skills" aria-labelledby="skillsTitle">
+      <p class="eyebrow">Skills</p>
+      <h2 class="title" id="skillsTitle">Technical skills</h2>
+      <div class="skills">
+        <div class="skill"><h3>Languages</h3><ul><li>Python</li><li>Java</li><li>JavaScript</li><li>SQL</li><li>HTML/CSS</li></ul></div>
+        <div class="skill"><h3>Backend and web</h3><ul><li>Flask</li><li>REST API design</li><li>JWT auth</li><li>RBAC</li><li>Web Workers</li><li>Leaflet</li></ul></div>
+        <div class="skill"><h3>Databases</h3><ul><li>PostgreSQL</li><li>SQLite</li><li>Schema design</li><li>Indexes and constraints</li></ul></div>
+        <div class="skill"><h3>Data and ML</h3><ul><li>pandas</li><li>NumPy</li><li>scikit-learn</li><li>OpenCV</li><li>Model evaluation</li></ul></div>
+        <div class="skill"><h3>Testing and tooling</h3><ul><li>pytest</li><li>Playwright</li><li>GitHub Actions</li><li>Git</li><li>Coverage</li></ul></div>
+      </div>
+    </section>
+
+    <!-- education -->
+    <section id="education" aria-labelledby="eduTitle">
+      <p class="eyebrow">Education</p>
+      <h2 class="title" id="eduTitle">Education</h2>
+      <div class="schools">
+        <div class="school">
+          <h3>Northeastern University</h3>
+          <p class="deg">B.S. Computer Science and Business Administration · Dean's Scholarship</p>
+          <time datetime="2027-01">Jan 2027 – May 2030</time> · <span class="where">Boston, MA</span>
+        </div>
+        <div class="school">
+          <h3>Queen's University Belfast</h3>
+          <p class="deg">Coursework: Discrete Structures, Data Structures, Program Design (OOP), Calculus</p>
+          <time datetime="2026-09">Sep 2026 – Dec 2026</time> · <span class="where">Belfast, UK</span>
+          <p class="more">Computing, Data and AI, Debating and Rowing societies</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- contact -->
+    <div class="contact" id="contact">
+      <div>
+        <h2>Let's talk</h2>
+        <p>I'm looking for Summer 2027 internships in software engineering, AI/ML or data, and happy to talk about any of these projects.</p>
+      </div>
+      <div class="cta">
+        <a class="btn primary" href="mailto:zhang.l17@northeastern.edu">Email me</a>
+        <a class="btn" href="https://www.linkedin.com/in/luke-zhang-nu/">LinkedIn</a>
+        <a class="btn" href="https://github.com/luke-zhang-cs-py">GitHub</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Luke Zhang</span>
+    <span>Demos are hosted on GitHub Pages. Every project is MIT-licensed, with CI on each push.</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    // theme toggle
+    var root = document.documentElement, btn = document.getElementById('themeBtn');
+    function label() { btn.setAttribute('aria-label', root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'); }
+    label();
+    btn.addEventListener('click', function () {
+      root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem('theme', root.dataset.theme); } catch (e) { /* not saved */ }
+      label();
+    });
+
+    // demo GIFs: load now, or on Play for visitors who ask for less motion
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.shot img[data-src]').forEach(function (img) {
+      var play = img.parentNode.querySelector('.play');
+      if (!reduced) { img.src = img.dataset.src; return; }
+      img.parentNode.classList.add('reduced');
+      img.hidden = true;
+      play.hidden = false;
+      play.addEventListener('click', function () { img.src = img.dataset.src; img.hidden = false; play.hidden = true; });
+    });
+
+    // mark the section in view
+    var links = {};
+    document.querySelectorAll('.bar nav a').forEach(function (a) { links[a.getAttribute('href').slice(1)] = a; });
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        Object.keys(links).forEach(function (k) { links[k].removeAttribute('aria-current'); });
+        if (links[e.target.id]) links[e.target.id].setAttribute('aria-current', 'true');
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    ['about', 'projects', 'skills', 'education', 'contact'].forEach(function (id) { io.observe(document.getElementById(id)); });
+  })();
+</script>
+<noscript><style>.shot{display:none}</style></noscript>
+</body>
+</html>
