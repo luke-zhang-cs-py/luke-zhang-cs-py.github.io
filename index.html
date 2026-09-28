@@ -8,8 +8,7 @@
 <meta name="author" content="Luke Zhang">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: https://luke-zhang-cs-py.github.io; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://luke-zhang-cs-py.github.io/">
-<meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#F8FAFC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1220">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Luke Zhang · Software Engineering Portfolio">
 <meta property="og:description" content="Backend, data and machine-learning projects, each with a live demo that runs in the browser.">
@@ -32,11 +31,11 @@
 }
 </script>
 <script>
-  // Theme before first paint, so a dark-mode visitor never sees a white flash.
+  // Theme before first paint, so the page never flashes white before going dark.
   (function () {
     var saved = null;
     try { saved = localStorage.getItem('theme'); } catch (e) { /* storage blocked */ }
-    var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var dark = saved !== 'light';   // dark unless the visitor has chosen light
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
     document.documentElement.classList.add('js');
   })();
@@ -159,16 +158,14 @@
   .links{display:flex;flex-wrap:wrap;gap:10px}
   .links .btn{padding:.6em 1em;font-size:.9rem}
 
-  /* skills and education: tiles that wrap as the width allows */
-  .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:var(--gap-m)}
+  /* skills: eight blocks, always in whole rows -- four across, two, or one -- chosen by the room the grid has */
+  #skills{container:skills / inline-size}
+  .skills{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--gap-m)}
+  @container skills (min-width:30rem){ .skills{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @container skills (min-width:56rem){ .skills{grid-template-columns:repeat(4,minmax(0,1fr))} }
   .skill h3{font-size:.95rem;margin:0 0 12px}
   .skill ul{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
   .skill li{font-size:.86rem;background:var(--surface-2);border-radius:6px;padding:4px 9px}
-  .schools{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));gap:var(--gap-m)}
-  .school h3{margin:0 0 4px;font-size:1.1rem}
-  .school .deg{margin:0 0 8px;color:var(--muted)}
-  .school time,.school .where{font-family:var(--mono);font-size:.82rem;color:var(--faint)}
-  .school p.more{margin:10px 0 0;font-size:.9rem;color:var(--muted)}
 
   /* contact */
   .contact{margin:var(--section) 0 0;border-radius:var(--r-l);padding:clamp(24px,4vw,40px);display:flex;flex-wrap:wrap;gap:var(--gap-m);justify-content:space-between;align-items:center}
@@ -205,7 +202,6 @@
       <a href="#about">About</a>
       <a href="#projects">Projects</a>
       <a href="#skills">Skills</a>
-      <a href="#education">Education</a>
       <a href="#contact">Contact</a>
     </nav>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to dark theme">
@@ -450,29 +446,13 @@
       <h2 class="title" id="skillsTitle">Technical skills</h2>
       <div class="skills">
         <div class="skill card"><h3>Languages</h3><ul><li>Python</li><li>Java</li><li>JavaScript</li><li>SQL</li><li>HTML/CSS</li></ul></div>
-        <div class="skill card"><h3>Backend and web</h3><ul><li>Flask</li><li>REST API design</li><li>JWT auth</li><li>RBAC</li><li>Web Workers</li><li>Leaflet</li></ul></div>
-        <div class="skill card"><h3>Databases</h3><ul><li>PostgreSQL</li><li>SQLite</li><li>Schema design</li><li>Indexes and constraints</li></ul></div>
-        <div class="skill card"><h3>Data and ML</h3><ul><li>pandas</li><li>NumPy</li><li>scikit-learn</li><li>OpenCV</li><li>Model evaluation</li></ul></div>
-        <div class="skill card"><h3>Testing and tooling</h3><ul><li>pytest</li><li>Playwright</li><li>GitHub Actions</li><li>Git</li><li>Coverage</li></ul></div>
-      </div>
-    </section>
-
-    <!-- education -->
-    <section id="education" class="reveal" aria-labelledby="eduTitle">
-      <p class="eyebrow">Education</p>
-      <h2 class="title" id="eduTitle">Education</h2>
-      <div class="schools">
-        <div class="school card">
-          <h3>Northeastern University</h3>
-          <p class="deg">B.S. Computer Science and Business Administration · Dean's Scholarship</p>
-          <time datetime="2027-01">Jan 2027 – May 2030</time> · <span class="where">Boston, MA</span>
-        </div>
-        <div class="school card">
-          <h3>Queen's University Belfast</h3>
-          <p class="deg">Coursework: Discrete Structures, Data Structures, Program Design (OOP), Calculus</p>
-          <time datetime="2026-09">Sep 2026 – Dec 2026</time> · <span class="where">Belfast, UK</span>
-          <p class="more">Computing, Data and AI, Debating and Rowing societies</p>
-        </div>
+        <div class="skill card"><h3>Backend and APIs</h3><ul><li>Flask</li><li>REST API design</li><li>JWT auth</li><li>RBAC</li><li>SMTP email</li></ul></div>
+        <div class="skill card"><h3>Databases</h3><ul><li>PostgreSQL</li><li>SQLite</li><li>Schema design</li><li>Indexes and constraints</li><li>Write locks</li></ul></div>
+        <div class="skill card"><h3>Data and ML</h3><ul><li>pandas</li><li>NumPy</li><li>scikit-learn</li><li>TF-IDF</li><li>Cross-validation</li></ul></div>
+        <div class="skill card"><h3>Algorithms</h3><ul><li>Dijkstra</li><li>Binary heaps</li><li>Alpha-beta search</li><li>Zobrist hashing</li><li>Interval scheduling</li></ul></div>
+        <div class="skill card"><h3>Computer vision</h3><ul><li>OpenCV</li><li>LBPH recognition</li><li>YuNet detection</li><li>MediaPipe</li><li>Liveness checks</li></ul></div>
+        <div class="skill card"><h3>Geospatial and real-time</h3><ul><li>GTFS</li><li>GTFS-realtime</li><li>Protobuf</li><li>Leaflet</li><li>OpenStreetMap</li></ul></div>
+        <div class="skill card"><h3>Testing and tooling</h3><ul><li>pytest</li><li>Playwright</li><li>GitHub Actions</li><li>Coverage</li><li>Web Workers</li></ul></div>
       </div>
     </section>
 
@@ -502,9 +482,8 @@
   (function () {
     var root = document.documentElement;
 
-    // ---- theme: the system's until the visitor chooses, then theirs
+    // ---- theme: dark until the visitor chooses light, then whatever they chose
     var btn = document.getElementById('themeBtn');
-    var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
     function applyTheme(theme) {
       root.dataset.theme = theme;
       btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
@@ -512,14 +491,12 @@
       var bg = getComputedStyle(root).getPropertyValue('--bg').trim();
       document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = bg; });
     }
-    function savedTheme() { try { return localStorage.getItem('theme'); } catch (e) { return null; } }
     applyTheme(root.dataset.theme);
     btn.addEventListener('click', function () {
       var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
       try { localStorage.setItem('theme', next); } catch (e) { /* not remembered */ }
       applyTheme(next);
     });
-    systemDark.addEventListener('change', function (e) { if (!savedTheme()) applyTheme(e.matches ? 'dark' : 'light'); });
 
     // ---- demo GIFs: <picture> already chose a blank still for visitors who ask for less
     // motion; Play takes that choice away, so the GIF loads.

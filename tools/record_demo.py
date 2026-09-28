@@ -4,7 +4,7 @@
 
 One browser, real waits, in dark mode throughout: the page loads, scrolls from the
 introduction through the projects (pausing on each so its own demo GIF plays and
-the cards ease in), and carries on to skills, education and contact. Frames are captured at 1280x800 and
+the cards ease in), and carries on to skills and contact. Frames are captured at 1280x800 and
 saved at 880x550.
 """
 import io, pathlib, sys

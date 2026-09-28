@@ -9,7 +9,7 @@ and links to its write-up and source.
 
 ### ▶ [Open the portfolio →](https://luke-zhang-cs-py.github.io/)
 
-![Scrolling the portfolio in dark mode: the introduction, then Toronto Transit, Almanac, the chess coach, face recognition, the spam classifier and Tally, each with its own demo playing, then skills, education and contact](docs/demo.gif)
+![Scrolling the portfolio in dark mode: the introduction, then Toronto Transit, Almanac, the chess coach, face recognition, the spam classifier and Tally, each with its own demo playing, then the skills and contact sections](docs/demo.gif)
 
 *Above: the live site in dark mode, top to bottom. Each project's own demo plays inside its card as
 the cards ease in. Recorded from the published page by [`tools/record_demo.py`](tools/record_demo.py).*
@@ -35,7 +35,7 @@ Double-click `index.html`. It's plain HTML and CSS with a little JavaScript: no 
 
 ```bash
 pip install -r requirements.txt && python -m playwright install chromium
-python tests/check_site.py        # 35 checks in a real browser (--offline skips the 3 that need the network)
+python tests/check_site.py        # 36 checks in a real browser (--offline skips the 3 that need the network)
 python tests/check_site.py --coverage coverage.html   # plus which lines of JS and CSS rules ran
 python tools/record_demo.py       # re-record docs/demo.gif from the live site
 python tools/make_og.py           # re-render og.png, the link-preview image

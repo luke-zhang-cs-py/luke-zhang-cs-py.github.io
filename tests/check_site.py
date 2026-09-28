@@ -17,7 +17,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGE = (ROOT / "index.html").as_uri()
-SECTIONS = ["about", "projects", "skills", "education", "contact"]
+SECTIONS = ["about", "projects", "skills", "contact"]
+SKILL_BLOCKS = 8
 WIDTHS = (1280, 820, 390)
 DEMOS = 6
 NETWORK_CHECKS = 3          # the W3C validator, figures against the READMEs, and outbound links
@@ -172,7 +173,9 @@ def check_files():
 def check_structure(pg):
     ids = pg.evaluate("[...document.querySelectorAll('.bar nav a')].map(a => a.getAttribute('href').slice(1))")
     check("every section in the nav exists (%s)" % ", ".join(ids), ids == SECTIONS and all(pg.locator("#" + i).count() == 1 for i in ids))
-    check("two schools in Education, and no Experience section", pg.locator(".school").count() == 2 and pg.locator("#experience, .job").count() == 0)
+    check("no Experience or Education section", pg.locator("#experience, .job, #education, .school").count() == 0)
+    check("eight skill blocks, each with a heading and at least four skills",
+          pg.locator(".skill").count() == SKILL_BLOCKS and pg.evaluate("[...document.querySelectorAll('.skill')].every(s => s.querySelector('h3') && s.querySelectorAll('li').length >= 4)"))
     check("six projects, each with a live demo, a write-up or guide, and its source",
           pg.locator(".project").count() == DEMOS and pg.evaluate("""[...document.querySelectorAll('.project')].every(p => {
               const hrefs = [...p.querySelectorAll('.links a')].map(a => a.href);
@@ -233,24 +236,22 @@ def check_theme(browser):
     pg = open_page(browser, viewport={"width": 1280, "height": 900}, color_scheme="light")
     theme = lambda: pg.evaluate("document.documentElement.dataset.theme")
     toolbar = lambda: pg.evaluate("[...document.querySelectorAll('meta[name=\"theme-color\"]')].map(m => m.content).join()")
+    check("the page opens in dark mode, even on a system set to light", theme() == "dark")
+    pg.emulate_media(color_scheme="dark"); pg.emulate_media(color_scheme="light"); pg.wait_for_timeout(100)
+    check("a system theme change doesn't override it", theme() == "dark")
     before = pg.evaluate("getComputedStyle(document.body).backgroundColor")
-    pg.emulate_media(color_scheme="dark"); pg.wait_for_timeout(100)
-    check("with no choice made, the page follows the system switching to dark", theme() == "dark")
-    pg.emulate_media(color_scheme="light"); pg.wait_for_timeout(100)
-    pg.click("#themeBtn")
+    pg.click("#themeBtn"); pg.wait_for_timeout(400)
     after = pg.evaluate("getComputedStyle(document.body).backgroundColor")
-    check("the theme button switches to dark", theme() == "dark" and before != after, (before, after))
-    check("the browser toolbar colour follows the chosen theme", toolbar() == "#0B1220,#0B1220", toolbar())
-    pg.emulate_media(color_scheme="light"); pg.wait_for_timeout(100)
-    check("once chosen, the theme no longer follows the system", theme() == "dark")
+    check("the theme button switches to light", theme() == "light" and before != after, (before, after))
+    check("the browser toolbar colour follows the chosen theme", toolbar() == "#F8FAFC", toolbar())
     reload_page(pg)
-    check("dark mode is remembered after a reload", theme() == "dark")
+    check("a choice of light is remembered after a reload", theme() == "light")
     if SHOTS:
         scroll_to(pg, "document.getElementById('projects').getBoundingClientRect().top + scrollY"); pg.wait_for_timeout(1200)
         pg.screenshot(path=SHOTS + "/pf-dark.png")
     errors = close_page(pg)
     d = open_page(browser, viewport={"width": 1280, "height": 900}, color_scheme="dark")
-    check("a visitor whose system is dark gets dark mode first", d.evaluate("document.documentElement.dataset.theme") == "dark")
+    check("a visitor whose system is dark gets dark mode too", d.evaluate("document.documentElement.dataset.theme") == "dark")
     return errors + close_page(d)
 
 
