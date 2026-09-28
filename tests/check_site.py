@@ -19,7 +19,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGE = (ROOT / "index.html").as_uri()
 SECTIONS = ["about", "projects", "skills", "contact"]
 SKILL_BLOCKS = 8
-WIDTHS = (1280, 820, 390)
+WIDTHS = (1280, 820, 390, 360)
 DEMOS = 6
 NETWORK_CHECKS = 3          # the W3C validator, figures against the READMEs, and outbound links
 OFFLINE = "--offline" in sys.argv
@@ -190,6 +190,66 @@ def check_structure(pg):
     check("the test total (%d) is the sum of the projects' own counts" % total, len(parts) == DEMOS and sum(parts) == total, "%s = %d" % (parts, sum(parts)))
 
 
+def check_components(pg):
+    """The featured case study, the category filter, the command palette and the contact form."""
+    featured = pg.evaluate("[...document.querySelectorAll('.project.featured .case dt')].map(d => d.textContent)")
+    check("one featured project, told as problem, approach and result", pg.locator(".project.featured").count() == 1 and featured == ["Problem", "Approach", "Result"], featured)
+
+    visible = lambda: pg.evaluate("[...document.querySelectorAll('.project')].filter(a => !a.hidden).map(a => a.id)")
+    pg.click('.chip[data-filter="Computer vision"]')
+    cv, count = visible(), pg.text_content("#projectCount")
+    pg.click('.chip[data-filter="All"]')
+    check("the filter shows only a category's projects, and says how many", cv == ["faces"] and "1 of 6" in count and len(visible()) == DEMOS, (cv, count))
+    check("the pressed filter is announced as pressed", pg.get_attribute('.chip[data-filter="All"]', "aria-pressed") == "true")
+
+    pg.keyboard.press("Control+k")
+    opened = pg.evaluate("document.getElementById('palette').open && document.activeElement.id === 'paletteInput'")
+    pg.keyboard.type("skills"); pg.keyboard.press("Enter"); pg.wait_for_timeout(1500)
+    landed = pg.evaluate("Math.abs(document.getElementById('skills').getBoundingClientRect().top) < 120")
+    check("Ctrl+K opens the command palette, and typing a section then Enter goes there", opened and landed and not pg.evaluate("document.getElementById('palette').open"), (opened, landed))
+    pg.keyboard.press("/"); pg.keyboard.type("tally"); pg.keyboard.press("ArrowDown")
+    second = pg.evaluate("document.querySelector('#paletteList [aria-selected=\"true\"]').textContent")
+    pg.keyboard.press("Escape")
+    pg.keyboard.press("Control+k"); pg.keyboard.type("copy my email"); pg.keyboard.press("Enter")
+    copied = pg.text_content("#formStatus")
+    check("the palette's Copy my email address command says it copied it", "Copied zhang.l17@northeastern.edu" in copied, copied)
+    check("/ opens it too, arrows move through the matches, and Esc closes it",
+          "demo" in second and not pg.evaluate("document.getElementById('palette').open"), second)
+
+    pg.click("#contactForm button[type=submit]")
+    empty = (pg.get_attribute("#cfName", "aria-invalid"), pg.text_content("#formStatus"))
+    pg.fill("#cfName", "Ada"); pg.fill("#cfEmail", "ada@example.com"); pg.fill("#cfMessage", "Hello & welcome")
+    pg.click("#contactForm button[type=submit]"); pg.wait_for_timeout(300)
+    mailto = pg.evaluate("document.getElementById('contactForm').dataset.mailto || ''")
+    check("the contact form refuses to send empty, and marks what's missing", empty[0] == "true" and "fill in" in empty[1], empty)
+    check("a filled-in form becomes an email to Luke with the message in it",
+          mailto.startswith("mailto:zhang.l17@northeastern.edu?subject=Portfolio%3A%20message%20from%20Ada") and "Hello%20%26%20welcome" in mailto, mailto[:90])
+
+
+def contrast_failures(pg):
+    """WCAG AA: every piece of visible text against the colour actually behind it."""
+    return pg.evaluate("""() => {
+      // rgb()/rgba() give 0-255 channels; color(srgb ...), which Chrome uses for color-mix(), gives 0-1
+      const parse = c => { const n = c.match(/[\d.]+/g).map(Number); const unit = c.startsWith('color(') ? 1 : 255;
+                           return { rgb: n.slice(0, 3).map(v => v / unit), a: n.length > 3 ? n[3] : 1 }; };
+      const lum = c => { const [r, g, b] = parse(c).rgb.map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+                         return .2126 * r + .7152 * g + .0722 * b; };
+      const behind = el => { for (let e = el; e; e = e.parentElement) { const bg = getComputedStyle(e).backgroundColor;
+                         if (/\d/.test(bg) && parse(bg).a > .5) return bg; } return getComputedStyle(document.body).backgroundColor; };
+      const out = [];
+      for (const el of document.querySelectorAll('body *')) {
+        if (!el.childNodes.length || ![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+        const s = getComputedStyle(el); if (s.visibility === 'hidden' || s.display === 'none' || !el.getClientRects().length) continue;
+        if (el.closest('dialog:not([open]), [hidden], .skip, noscript')) continue;
+        const big = parseFloat(s.fontSize) >= 24 || (parseFloat(s.fontSize) >= 18.66 && +s.fontWeight >= 700);
+        const [L1, L2] = [lum(s.color), lum(behind(el))].sort((a, b) => b - a);
+        const ratio = (L1 + .05) / (L2 + .05);
+        if (ratio < (big ? 3 : 4.5)) out.push(el.tagName + '.' + el.className + ' ' + ratio.toFixed(2) + ' "' + el.textContent.trim().slice(0, 24) + '"');
+      }
+      return [...new Set(out)];
+    }""")
+
+
 def check_demos(pg):
     for y in range(0, pg.evaluate("document.body.scrollHeight"), 500):
         scroll_to(pg, y)
@@ -237,6 +297,9 @@ def check_theme(browser):
     theme = lambda: pg.evaluate("document.documentElement.dataset.theme")
     toolbar = lambda: pg.evaluate("[...document.querySelectorAll('meta[name=\"theme-color\"]')].map(m => m.content).join()")
     check("the page opens in dark mode, even on a system set to light", theme() == "dark")
+    pg.evaluate("document.querySelectorAll('.reveal').forEach(e => e.classList.add('in'))"); pg.wait_for_timeout(700)
+    dark_fail = contrast_failures(pg)
+    check("dark mode: all text meets WCAG AA contrast", not dark_fail, dark_fail[:4])
     pg.emulate_media(color_scheme="dark"); pg.emulate_media(color_scheme="light"); pg.wait_for_timeout(100)
     check("a system theme change doesn't override it", theme() == "dark")
     before = pg.evaluate("getComputedStyle(document.body).backgroundColor")
@@ -244,6 +307,8 @@ def check_theme(browser):
     after = pg.evaluate("getComputedStyle(document.body).backgroundColor")
     check("the theme button switches to light", theme() == "light" and before != after, (before, after))
     check("the browser toolbar colour follows the chosen theme", toolbar() == "#F8FAFC", toolbar())
+    light_fail = contrast_failures(pg)
+    check("light mode: all text meets WCAG AA contrast", not light_fail, light_fail[:4])
     reload_page(pg)
     check("a choice of light is remembered after a reload", theme() == "light")
     if SHOTS:
@@ -335,6 +400,7 @@ with sync_playwright() as pw:
     browser = pw.chromium.launch()
     pg = open_page(browser, viewport={"width": WIDTHS[0], "height": 900}, color_scheme="light")
     check_structure(pg)
+    check_components(pg)
     check_demos(pg)
     check_nav(pg)
     check_meta(pg)

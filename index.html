@@ -42,7 +42,7 @@
 </script>
 <style>
   :root{
-    --bg:#F8FAFC; --surface:#FFFFFF; --surface-2:#F1F5F9; --text:#0F172A; --muted:#475569; --faint:#64748B;
+    --bg:#F8FAFC; --surface:#FFFFFF; --surface-2:#F1F5F9; --text:#0F172A; --muted:#475569; --faint:#5B6B80;
     --line:#E2E8F0; --accent:#0F766E; --accent-strong:#115E59; --accent-wash:#CCFBF1; --on-accent:#FFFFFF;
     --shadow:0 1px 2px rgba(15,23,42,.06),0 12px 32px -16px rgba(15,23,42,.25);
     --shadow-lift:0 2px 4px rgba(15,23,42,.08),0 22px 44px -18px rgba(15,23,42,.35);
@@ -62,7 +62,7 @@
     color-scheme:light;
   }
   [data-theme="dark"]{
-    --bg:#0B1220; --surface:#111A2E; --surface-2:#16213A; --text:#E2E8F0; --muted:#A3B1C6; --faint:#8494AB;
+    --bg:#0B1220; --surface:#111A2E; --surface-2:#16213A; --text:#E2E8F0; --muted:#A3B1C6; --faint:#8C9BB2;
     --line:#22304A; --accent:#2DD4BF; --accent-strong:#5EEAD4; --accent-wash:#0F3B3A; --on-accent:#042F2E;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -18px rgba(0,0,0,.7);
     --shadow-lift:0 2px 4px rgba(0,0,0,.35),0 26px 48px -20px rgba(0,0,0,.8);
@@ -72,16 +72,19 @@
   html{scroll-behavior:smooth;scroll-padding-top:calc(var(--bar-h) + 16px)}
   body{margin:0;background:var(--bg);color:var(--text);font:clamp(15px,.9rem + .2vw,17px)/1.65 var(--sans);-webkit-font-smoothing:antialiased}
   a{color:inherit;text-underline-offset:3px}
-  a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+  a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
   .skip{position:absolute;left:-9999px;top:8px;background:var(--accent);color:var(--on-accent);padding:8px 14px;border-radius:6px;z-index:10}
   .skip:focus{left:12px}
   .wrap{max-width:1120px;margin:0 auto;padding:0 var(--gutter)}
   section{padding:var(--section) 0 0}
-  .eyebrow{font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  /* section labels are written as code comments */
+  .eyebrow{font-family:var(--mono);font-size:.82rem;color:var(--accent);margin:0 0 10px}
+  .eyebrow::before{content:"// ";color:var(--faint)}
   h2.title{font-size:clamp(1.6rem,1.2rem + 2vw,2.3rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 var(--gap-l)}
+  kbd{font-family:var(--mono);font-size:.78em;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--surface-2);color:var(--muted)}
 
   /* the theme cross-fades rather than snapping */
-  body,.bar,.card,.project,.shot,.btn,.icon-btn,.tags li,.impact li,.skill li{transition:background-color .3s var(--ease),border-color .3s var(--ease),color .3s var(--ease),box-shadow .3s var(--ease),transform .3s var(--ease)}
+  body,.bar,.card,.project,.shot,.btn,.icon-btn,.tags li,.impact li,.skill li,.chip,.field input,.field textarea{transition:background-color .3s var(--ease),border-color .3s var(--ease),color .3s var(--ease),box-shadow .3s var(--ease),transform .3s var(--ease)}
 
   /* one card: every tile on the page shares it */
   .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--pad-card)}
@@ -96,67 +99,93 @@
   .bar nav a{font-size:.92rem;color:var(--muted);text-decoration:none;white-space:nowrap;padding:6px 0;background:linear-gradient(var(--accent),var(--accent)) no-repeat 0 100%/0 2px;transition:background-size .25s var(--ease),color .2s}
   .bar nav a:hover,.bar nav a[aria-current="true"]{color:var(--text)}
   .bar nav a[aria-current="true"]{background-size:100% 2px}
-  .icon-btn{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;flex:none}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:38px;height:38px;padding:0 9px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;flex:none;font:600 .8rem var(--mono)}
   .icon-btn:hover{border-color:var(--accent)}
   .icon-btn svg{width:18px;height:18px}
   [data-theme="dark"] .moon,[data-theme="light"] .sun{display:none}
 
   /* hero */
   .hero{padding:clamp(56px,10vw,112px) 0 0}
+  .status{font-family:var(--mono);font-size:.85rem;color:var(--muted);margin:0 0 18px}
+  .status b{color:var(--accent);font-weight:600}
   .hero h1{font-size:clamp(2.5rem,1.4rem + 5.4vw,4.6rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 18px}
   .hero .role{font-size:clamp(1.08rem,.95rem + .7vw,1.38rem);color:var(--muted);margin:0 0 22px;max-width:46ch}
   .hero .role strong{color:var(--text);font-weight:600}
   .hero .lede{max-width:62ch;color:var(--muted);margin:0 0 30px}
   .cta{display:flex;flex-wrap:wrap;gap:var(--gap-s)}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:.7em 1.15em;border-radius:10px;font-weight:600;font-size:.95rem;text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--text)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:.7em 1.15em;border-radius:10px;font:600 .95rem var(--sans);text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer}
   .btn:hover{border-color:var(--accent);transform:translateY(-1px)}
   .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
   .btn.primary:hover{background:var(--accent-strong)}
   .btn svg{width:17px;height:17px;flex:none}
+  .hint{font-size:.85rem;color:var(--faint);margin:18px 0 0}
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:var(--gap-s);margin:clamp(36px,6vw,56px) 0 0}
   .stats .card{padding:clamp(14px,2vw,20px)}
   .stats b{display:block;font-size:clamp(1.4rem,1.1rem + 1.2vw,1.8rem);letter-spacing:-.02em}
   .stats span{font-size:.86rem;color:var(--muted)}
 
-  /* about: two columns while there's room, one when there isn't */
-  .about{display:flex;flex-wrap:wrap;gap:var(--gap-l)}
-  .about > div{flex:1.4 1 26rem}
-  .about p{margin:0 0 14px;color:var(--muted)}
-  .about p strong{color:var(--text)}
+  /* about: photo, bio and focus, wrapping as the width allows */
+  .about{display:flex;flex-wrap:wrap;gap:var(--gap-l);align-items:flex-start}
+  .avatar{flex:none;width:clamp(96px,14vw,148px);aspect-ratio:1;border-radius:24px;display:grid;place-items:center;margin:0;
+    background:linear-gradient(135deg,var(--accent-wash),var(--surface-2));border:1px solid var(--line);font:700 clamp(2rem,1.4rem + 2vw,3rem) var(--sans);color:var(--accent);letter-spacing:-.04em}
+  .avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+  .bio{flex:1.4 1 22rem}
+  .bio p{margin:0 0 14px;color:var(--muted)}
+  .bio p strong{color:var(--text)}
   .focus{flex:1 1 18rem;list-style:none;margin:0;padding:0;display:grid;gap:var(--gap-s);align-content:start}
   .focus .card{padding:14px 16px}
   .focus b{display:block;font-size:.95rem}
   .focus span{font-size:.88rem;color:var(--muted)}
 
-  /* projects: each card lays itself out by the width it has, not the window's */
+  /* projects: a featured case study, then a grid; each card lays itself out by the room it has */
+  .filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 var(--gap-m)}
+  .chip{font:600 .82rem var(--mono);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+  .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+  .count{font-family:var(--mono);font-size:.82rem;color:var(--faint);margin:0 0 var(--gap-m)}
   .projects{display:grid;gap:var(--gap-l);container:projects / inline-size}
-  .project{display:grid;grid-template-columns:minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);overflow:hidden;box-shadow:var(--shadow)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,19rem),1fr));gap:var(--gap-m)}
+  .project{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);overflow:hidden;box-shadow:var(--shadow)}
+  .project[hidden]{display:none}
   .project:hover{box-shadow:var(--shadow-lift);transform:translateY(-2px)}
+  .project.featured{display:grid;grid-template-columns:minmax(0,1fr)}
   @container projects (min-width:900px){
-    .project{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
-    .project.flip .shot{order:2}
-    .project.tall{grid-template-columns:minmax(0,.7fr) minmax(0,1fr)}
+    .project.featured{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
   }
-  .shot{background:var(--surface-2);padding:clamp(12px,2.2vw,22px);display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .shot{background:var(--surface-2);padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .project.featured .shot{justify-content:flex-start}
+  /* every grid card's demo gets the same frame, so the text below starts level across a row */
+  .grid .shot{aspect-ratio:16/10;position:relative;padding:0}
+  .grid .shot picture,.grid .play{position:absolute;inset:12px;width:auto;height:auto}
   .shot picture{display:block}
   .shot img{display:block;width:100%;height:auto;border-radius:var(--r-s);border:1px solid var(--line);background:var(--surface)}
-  .project.tall .shot img,.project.tall .play{max-width:300px;margin:0 auto}
+  .grid .shot img{height:100%;object-fit:contain;object-position:top center;border:0;background:none}
   .play{display:none;width:100%;aspect-ratio:var(--ratio);border:1px dashed var(--line);border-radius:var(--r-s);background:var(--surface);color:var(--text);font:600 .95rem var(--sans);cursor:pointer}
   .reduced .play:not([hidden]){display:block}
-  .body{padding:var(--pad-body)}
+  .body{padding:var(--pad-body);display:flex;flex-direction:column;flex:1}
+  .grid .body{padding:var(--pad-card)}
   .meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 6px;font-family:var(--mono);font-size:.8rem;color:var(--faint)}
   .meta .kind{color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
-  .project h3{font-size:clamp(1.3rem,1.1rem + .8vw,1.55rem);letter-spacing:-.02em;margin:0 0 10px;line-height:1.2}
+  .project h3{font-size:clamp(1.2rem,1.05rem + .7vw,1.55rem);letter-spacing:-.02em;margin:0 0 10px;line-height:1.2}
+  .grid .project h3{font-size:1.15rem}
   .project .pitch{margin:0 0 16px;color:var(--muted)}
-  .project ul.points{margin:0 0 18px;padding-left:18px}
-  .project ul.points li{margin:0 0 7px}
-  .impact{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:0;list-style:none}
+  .case{display:grid;gap:12px;margin:0 0 18px}
+  .case div{border-left:2px solid var(--accent);padding:2px 0 2px 14px}
+  .case dt{font:600 .78rem var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+  .case dd{margin:2px 0 0;color:var(--muted)}
+  details.inside{margin:0 0 16px}
+  details.inside summary{cursor:pointer;font:600 .85rem var(--mono);color:var(--muted)}
+  details.inside summary:hover{color:var(--text)}
+  details.inside ul{margin:10px 0 0;padding-left:18px;font-size:.93rem}
+  details.inside li{margin:0 0 6px}
+  .impact{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px;padding:0;list-style:none}
   .impact li{background:var(--accent-wash);color:var(--text);border-radius:var(--r-s);padding:5px 10px;font-size:.85rem}
   .impact b{font-family:var(--mono)}
-  .tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 22px;padding:0;list-style:none}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 20px;padding:0;list-style:none}
   .tags li{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
-  .links{display:flex;flex-wrap:wrap;gap:10px}
+  .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
   .links .btn{padding:.6em 1em;font-size:.9rem}
+  .grid .links .btn{padding:.5em .85em;font-size:.86rem}
 
   /* skills: eight blocks, always in whole rows -- four across, two, or one -- chosen by the room the grid has */
   #skills{container:skills / inline-size}
@@ -167,17 +196,42 @@
   .skill ul{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
   .skill li{font-size:.86rem;background:var(--surface-2);border-radius:6px;padding:4px 9px}
 
-  /* contact */
-  .contact{margin:var(--section) 0 0;border-radius:var(--r-l);padding:clamp(24px,4vw,40px);display:flex;flex-wrap:wrap;gap:var(--gap-m);justify-content:space-between;align-items:center}
-  .contact h2{margin:0 0 6px;font-size:clamp(1.35rem,1.1rem + 1vw,1.7rem);letter-spacing:-.02em}
-  .contact p{margin:0;color:var(--muted);max-width:52ch}
+  /* contact: the ways to reach me, and a form that hands the message to your mail app */
+  .contact{display:flex;flex-wrap:wrap;gap:var(--gap-l);border-radius:var(--r-l);padding:clamp(24px,4vw,40px)}
+  .contact > div{flex:1 1 18rem}
+  .contact h3{margin:0 0 8px;font-size:clamp(1.3rem,1.1rem + 1vw,1.6rem);letter-spacing:-.02em}
+  .contact p{margin:0 0 18px;color:var(--muted);max-width:52ch}
+  .contact form{flex:1.3 1 20rem;display:grid;gap:14px}
+  .field{display:grid;gap:6px}
+  .field label{font:600 .82rem var(--mono);color:var(--muted)}
+  .field input,.field textarea{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-s);padding:10px 12px;width:100%}
+  .field textarea{min-height:120px;resize:vertical}
+  .field input:focus,.field textarea:focus{border-color:var(--accent)}
+  .field [aria-invalid="true"]{border-color:#E5484D}
+  .form-status{min-height:1.4em;margin:0;font-size:.9rem;color:var(--muted)}
+  .form-status[data-kind="error"]{color:#F2555A}
+  [data-theme="light"] .form-status[data-kind="error"]{color:#B42318}
   footer{padding:clamp(28px,4vw,40px) 0 clamp(40px,6vw,60px);color:var(--faint);font-size:.86rem}
   footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
+
+  /* the command palette */
+  .palette{padding:0;border:1px solid var(--line);border-radius:var(--r-l);background:var(--surface);color:var(--text);width:min(560px,calc(100vw - 32px));box-shadow:var(--shadow-lift);margin:12vh auto auto}
+  .palette::backdrop{background:rgba(3,7,18,.55);backdrop-filter:blur(2px)}
+  .palette input{width:100%;border:0;border-bottom:1px solid var(--line);background:none;color:var(--text);font:1rem var(--sans);padding:16px 18px}
+  .palette input:focus{outline:none}
+  .palette ul{list-style:none;margin:0;padding:6px;max-height:min(360px,55vh);overflow:auto}
+  .palette li{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;border-radius:var(--r-s);cursor:pointer}
+  .palette li span{font:.78rem var(--mono);color:var(--faint)}
+  .palette li[aria-selected="true"]{background:var(--accent-wash)}
+  .palette .empty{padding:14px 18px;color:var(--faint);margin:0}
+  .palette footer{padding:8px 14px;border-top:1px solid var(--line);font-size:.78rem}
 
   /* sections ease in as they arrive (only when the script is running to reveal them) */
   .js .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
   .js .reveal.in{opacity:1;transform:none}
 
+  /* no keyboard on a touch screen, so no talk of shortcuts */
+  @media (hover:none) and (pointer:coarse){ .hint{display:none} }
   @media (prefers-reduced-motion:reduce){
     html{scroll-behavior:auto}
     *,*::before,*::after{transition:none !important}
@@ -185,8 +239,8 @@
     .project:hover,.btn:hover{transform:none}
   }
   @media print{
-    .bar,.shot,.cta,.links{display:none}
-    .project{grid-template-columns:1fr;box-shadow:none;break-inside:avoid}
+    .bar,.shot,.cta,.links,.filters,.contact form{display:none}
+    .project{box-shadow:none;break-inside:avoid}
     .js .reveal{opacity:1;transform:none}
     section{padding-top:24px}
   }
@@ -204,7 +258,10 @@
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
     </nav>
-    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to dark theme">
+    <button class="icon-btn" id="paletteBtn" type="button" aria-label="Open the command palette" title="Command palette (Ctrl K or /)" aria-keyshortcuts="Control+K /" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to light theme">
       <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
     </button>
@@ -214,260 +271,58 @@
 <main id="main">
   <div class="wrap">
 
-    <!-- hero -->
     <div class="hero" id="top">
-      <p class="eyebrow">Software engineering portfolio</p>
-      <h1>Luke Zhang</h1>
-      <p class="role"><strong>Computer Science and Business Administration</strong> at Northeastern University. Backend, data and machine learning.</p>
-      <p class="lede">I build systems that can show their working: every project below has a live demo that runs in your browser, a write-up of how it works and what went wrong, and a test suite that checks its own published numbers.</p>
-      <div class="cta">
-        <a class="btn primary" href="#projects">View projects</a>
-        <a class="btn" href="https://github.com/luke-zhang-cs-py" rel="me">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
-          GitHub</a>
-        <a class="btn" href="https://www.linkedin.com/in/luke-zhang-nu/" rel="me">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
-          LinkedIn</a>
-        <a class="btn" href="mailto:zhang.l17@northeastern.edu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-          Email</a>
-      </div>
-      <div class="stats reveal" role="group" aria-label="At a glance">
-        <div class="card"><b>6</b><span>open-source projects</span></div>
-        <div class="card"><b>6</b><span>live demos, no install</span></div>
-        <div class="card"><b data-tests-total>1,712</b><span>automated tests and checks</span></div>
-        <div class="card"><b>MIT</b><span>licensed, CI on every push</span></div>
-      </div>
+      <p class="status">$ status: <b>looking for Summer 2027 internships</b></p>
+      <h1 id="heroName">Luke Zhang</h1>
+      <p class="role" id="heroRole"></p>
+      <p class="lede" id="heroLede"></p>
+      <div class="cta" id="heroLinks"></div>
+      <p class="hint">Press <kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd> to jump anywhere.</p>
+      <div class="stats reveal" id="stats" role="group" aria-label="At a glance"></div>
     </div>
 
-    <!-- about -->
     <section id="about" class="reveal" aria-labelledby="aboutTitle">
-      <p class="eyebrow">About</p>
+      <p class="eyebrow">about</p>
       <h2 class="title" id="aboutTitle">Engineering that can be checked</h2>
       <div class="about">
-        <div>
-          <p>I'm a first-year <strong>Computer Science and Business Administration</strong> student starting at Northeastern University in January 2027 on a Dean's Scholarship, after a semester at Queen's University Belfast.</p>
-          <p>My work sits where software meets measurement: <strong>routing and search</strong>, <strong>backend systems</strong>, and <strong>machine learning</strong> that has been benchmarked for fairness. Each project ships with a test suite, a browser demo and an honest account of its limits.</p>
-          <p>I'm looking for <strong>Summer 2027 internships</strong> in software engineering, AI/ML or data.</p>
-        </div>
-        <ul class="focus">
-          <li class="card"><b>Backend and APIs</b><span>Flask REST APIs, JWT and role-based access, relational schema design</span></li>
-          <li class="card"><b>Data and evaluation</b><span>pandas pipelines, reproducible benchmarks, statistical agreement</span></li>
-          <li class="card"><b>Machine learning and vision</b><span>scikit-learn, OpenCV, fairness benchmarking</span></li>
-          <li class="card"><b>Algorithms</b><span>shortest paths, game-tree search, scheduling</span></li>
-        </ul>
+        <figure class="avatar" id="avatar" aria-label="Photo of Luke Zhang"></figure>
+        <div class="bio" id="bio"></div>
+        <ul class="focus" id="focus" aria-label="Focus areas"></ul>
       </div>
     </section>
 
-    <!-- projects -->
     <section id="projects" aria-labelledby="projTitle">
-      <p class="eyebrow">Projects</p>
+      <p class="eyebrow">projects</p>
       <h2 class="title" id="projTitle">Selected work</h2>
-      <div class="projects">
-
-        <article class="reveal project" id="transit" aria-labelledby="h-transit">
-          <div class="shot">
-            <picture>
-              <source media="(prefers-reduced-motion: reduce)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-              <img src="https://luke-zhang-cs-py.github.io/Toronto-Transit-Distance-Matrix/demo.gif" width="760" height="478" loading="lazy"
-                 alt="Dragging the time filter from 5 to 60 minutes: the reach spreads from a single stop to 247 of them, 30 km out">
-            </picture>
-            <button class="play" type="button" style="--ratio:760/478" hidden>▶ Play demo</button>
-          </div>
-          <div class="body">
-            <p class="meta"><span class="kind">Routing · geospatial</span><time datetime="2026-07">Jul 2026 – Present</time></p>
-            <h3 id="h-transit">Toronto Transit Reach</h3>
-            <p class="pitch">An isochrone map and time-dependent trip planner for Toronto: click anywhere and see how far you can get in 30 minutes, over the TTC's own timetable and live feed.</p>
-            <ul class="points">
-              <li>Shortest-path routing with Dijkstra's algorithm over a weighted multi-modal graph (adjacency list, binary heap).</li>
-              <li>Every wait is labelled by source: the next timetabled departure, half the live observed headway, or a modelled figure.</li>
-              <li>Live service alerts remove closed lines from the graph, so trips route around them.</li>
-              <li>The browser demo is a JavaScript port of the Python search; the build refuses to publish if they disagree at any stop.</li>
-            </ul>
-            <ul class="impact" aria-label="Results"><li><b>516</b> stops verified Python vs JS</li><li><b data-tests>235</b> tests · <b>100%</b> coverage</li></ul>
-            <ul class="tags" aria-label="Technologies"><li>Python</li><li>Flask</li><li>REST API</li><li>Leaflet</li><li>GTFS-realtime</li><li>JavaScript</li></ul>
-            <div class="links">
-              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Toronto-Transit-Distance-Matrix/app/">Live demo</a>
-              <a class="btn" href="https://luke-zhang-cs-py.github.io/Toronto-Transit-Distance-Matrix/">Write-up</a>
-              <a class="btn" href="https://github.com/luke-zhang-cs-py/Toronto-Transit-Distance-Matrix">Source</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="reveal project flip" id="almanac" aria-labelledby="h-almanac">
-          <div class="shot">
-            <picture>
-              <source media="(prefers-reduced-motion: reduce)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-              <img src="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/demo.gif" width="900" height="700" loading="lazy"
-                 alt="Five set-ups running through the same slot engine: a full week, a block that clips one slot, an afternoon blocked off, a day booked solid, and today with the morning gone">
-            </picture>
-            <button class="play" type="button" style="--ratio:900/700" hidden>▶ Play demo</button>
-          </div>
-          <div class="body">
-            <p class="meta"><span class="kind">Full stack · scheduling</span><time datetime="2026-08">Aug 2026 – Present</time></p>
-            <h3 id="h-almanac">Almanac</h3>
-            <p class="pitch">A calendar and the multi-role booking platform behind it: clients book a provider's free slots, and invites become bookings without the guest making an account.</p>
-            <ul class="points">
-              <li>RESTful API with JWT authentication and role-based access control for clients, providers and admins.</li>
-              <li>Relational schema on SQLite or PostgreSQL; a table lock and a partial unique index mean two people racing for one time can't both win it.</li>
-              <li>Availability computed from recurring weekly hours, blocked dates and bookings; five kinds of email, each sent exactly once.</li>
-              <li>Refuses to start in production with the committed development secret that signs every session.</li>
-            </ul>
-            <ul class="impact" aria-label="Results"><li><b data-tests>527</b> tests · <b>100%</b> of 1,971 statements</li><li><b>21</b> scenarios verified Python vs JS</li></ul>
-            <ul class="tags" aria-label="Technologies"><li>Python</li><li>Flask</li><li>JWT</li><li>RBAC</li><li>PostgreSQL</li><li>SQLite</li><li>SMTP</li></ul>
-            <div class="links">
-              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/app/">Live demo</a>
-              <a class="btn" href="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/calendar.html">Blank calendar</a>
-              <a class="btn" href="https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/">Write-up</a>
-              <a class="btn" href="https://github.com/luke-zhang-cs-py/Almanac-Main-Full-Stack-Calendar">Source</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="reveal project" id="chess" aria-labelledby="h-chess">
-          <div class="shot">
-            <picture>
-              <source media="(prefers-reduced-motion: reduce)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-              <img src="https://luke-zhang-cs-py.github.io/Dvoerstky-AI-Chess-Coach/docs/demo.gif" width="960" height="795" loading="lazy"
-                 alt="The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder">
-            </picture>
-            <button class="play" type="button" style="--ratio:960/795" hidden>▶ Play demo</button>
-          </div>
-          <div class="body">
-            <p class="meta"><span class="kind">Game engine · search</span><time datetime="2026-09">Sep 2026 – Present</time></p>
-            <h3 id="h-chess">Dvoretsky Lab</h3>
-            <p class="pitch">A chess training room built from one player's own Lichess games: an opponent that plays like you, drills cut from your mistakes, and Stockfish grading every move.</p>
-            <ul class="points">
-              <li>A chess engine from scratch: 0x88 move generation, alpha-beta with quiescence, a Zobrist transposition table and null-move pruning.</li>
-              <li>A "mirror" opponent that loses centipawns at the player's own rate and answers from their opening repertoire.</li>
-              <li>Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.</li>
-              <li>Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines.</li>
-            </ul>
-            <ul class="impact" aria-label="Results"><li>perft on <b>21</b> positions</li><li><b>+41</b> Elo by SPRT</li><li>about <b>1730</b> against Stockfish and Maia</li><li><b data-tests data-derived title="67 regression, 39 rules, 38 browser and 40 perft checks">184</b> checks</li></ul>
-            <ul class="tags" aria-label="Technologies"><li>JavaScript</li><li>Web Workers</li><li>Stockfish</li><li>UCI</li><li>Lichess API</li><li>Playwright</li></ul>
-            <div class="links">
-              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Dvoerstky-AI-Chess-Coach/">Live demo</a>
-              <a class="btn" href="https://github.com/luke-zhang-cs-py/Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md">Guide</a>
-              <a class="btn" href="https://github.com/luke-zhang-cs-py/Dvoerstky-AI-Chess-Coach">Source</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="reveal project flip" id="faces" aria-labelledby="h-faces">
-          <div class="shot">
-            <picture>
-              <source media="(prefers-reduced-motion: reduce)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-              <img src="https://luke-zhang-cs-py.github.io/Facial-Recognition-Software/demo.gif" width="900" height="570" loading="lazy"
-                 alt="A face tracked live: the instruction changes from No face detected to Move closer to Head upright to Ready, then a second person appears and the verdict becomes One person only">
-            </picture>
-            <button class="play" type="button" style="--ratio:900/570" hidden>▶ Play demo</button>
-          </div>
-          <div class="body">
-            <p class="meta"><span class="kind">Computer vision · fairness</span><time datetime="2026-08">Aug 2026 – Present</time></p>
-            <h3 id="h-faces">Face Recognition Attendance</h3>
-            <p class="pitch">A local attendance system: OpenCV reads the webcam, recognises enrolled faces and logs attendance to SQLite. No face data leaves the machine.</p>
-            <ul class="points">
-              <li>Detection, LBPH recognition, liveness checks and quality scoring, with a CLI for register, train, run and report.</li>
-              <li>Benchmarked on all of FairFace: a brightness-based quality gate flagged 38.8% of Black faces against 18.5% of White faces, and was rebuilt to be scale-free.</li>
-              <li>Match thresholds calibrated by gallery size over 4.77 billion impostor pairs, since a fixed cut fails as enrolment grows.</li>
-            </ul>
-            <ul class="impact" aria-label="Results"><li><b>97,698</b> faces benchmarked</li><li>detection <b>99.95%</b></li><li>bias <b>2.15×</b> → <b>1.24×</b></li><li><b data-tests>403</b> tests</li></ul>
-            <ul class="tags" aria-label="Technologies"><li>Python</li><li>OpenCV</li><li>Flask</li><li>SQLite</li><li>MediaPipe</li></ul>
-            <div class="links">
-              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/Facial-Recognition-Software/camera/">Live demo</a>
-              <a class="btn" href="https://luke-zhang-cs-py.github.io/Facial-Recognition-Software/">Write-up</a>
-              <a class="btn" href="https://github.com/luke-zhang-cs-py/Facial-Recognition-Software">Source</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="reveal project" id="spam" aria-labelledby="h-spam">
-          <div class="shot">
-            <picture>
-              <source media="(prefers-reduced-motion: reduce)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-              <img src="https://luke-zhang-cs-py.github.io/AI-Spam-Message-Classifier/demo.gif" width="720" height="653" loading="lazy"
-                 alt="Classifying three messages: a lunch text comes back HAM, a prize message SPAM, and a competition text SPAM at 79.1%, with the words ranked by how much each pushed the verdict">
-            </picture>
-            <button class="play" type="button" style="--ratio:720/653" hidden>▶ Play demo</button>
-          </div>
-          <div class="body">
-            <p class="meta"><span class="kind">Machine learning · NLP</span><time datetime="2026-07">Jul 2026 – Present</time></p>
-            <h3 id="h-spam">AI Spam Message Classifier</h3>
-            <p class="pitch">Spam or not, and which words drove the call, with the trained model exported into the page so nothing is uploaded.</p>
-            <ul class="points">
-              <li>TF-IDF over unigrams and bigrams, keeping the kind of each noisy token (links, money, short codes) rather than deleting it.</li>
-              <li>Naive Bayes and logistic regression compared on out-of-fold predictions, so no message is scored by a model that trained on it.</li>
-              <li>Decision threshold chosen for the best F1 with precision held at 0.90, and saved inside the model artifact.</li>
-            </ul>
-            <ul class="impact" aria-label="Results"><li>F1 <b>0.850</b> at precision <b>0.90</b></li><li><b data-tests>153</b> tests · <b>100%</b> coverage</li></ul>
-            <ul class="tags" aria-label="Technologies"><li>Python</li><li>scikit-learn</li><li>pandas</li><li>Flask</li><li>JavaScript</li></ul>
-            <div class="links">
-              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/AI-Spam-Message-Classifier/app/">Live demo</a>
-              <a class="btn" href="https://luke-zhang-cs-py.github.io/AI-Spam-Message-Classifier/">Write-up</a>
-              <a class="btn" href="https://github.com/luke-zhang-cs-py/AI-Spam-Message-Classifier">Source</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="reveal project flip tall" id="tally" aria-labelledby="h-tally">
-          <div class="shot">
-            <picture>
-              <source media="(prefers-reduced-motion: reduce)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
-              <img src="https://luke-zhang-cs-py.github.io/tally/demo.gif" width="470" height="903" loading="lazy"
-                 alt="Tapping 3, 5, 0 so the amount shifts in from the right as 3.50, choosing Coffee, saving, then a second entry, the day's total climbing to 15.90 euros">
-            </picture>
-            <button class="play" type="button" style="--ratio:470/903" hidden>▶ Play demo</button>
-          </div>
-          <div class="body">
-            <p class="meta"><span class="kind">Mobile-first · product</span><time datetime="2026-09">Sep 2026</time></p>
-            <h3 id="h-tally">Tally</h3>
-            <p class="pitch">A phone-first expense tracker for the seconds after you spend: tap an amount, tap a category, done.</p>
-            <ul class="points">
-              <li>A till-style keypad: digits shift in from the right, so there is no decimal point to place.</li>
-              <li>Anything bought three or more times in 90 days becomes a one-tap button carrying its amount and category.</li>
-              <li>Money stored as integer cents, and currencies never summed without a rate.</li>
-              <li>Local only: no account, no bank connection; exports CSV for reconciliation.</li>
-            </ul>
-            <ul class="impact" aria-label="Results"><li><b>2</b> taps for a regular purchase</li><li><b data-tests>210</b> tests</li></ul>
-            <ul class="tags" aria-label="Technologies"><li>Python</li><li>Flask</li><li>SQLite</li><li>JavaScript</li></ul>
-            <div class="links">
-              <a class="btn primary" href="https://luke-zhang-cs-py.github.io/tally/app/">Live demo</a>
-              <a class="btn" href="https://luke-zhang-cs-py.github.io/tally/">Write-up</a>
-              <a class="btn" href="https://github.com/luke-zhang-cs-py/tally">Source</a>
-            </div>
-          </div>
-        </article>
-      </div>
+      <div class="filters" id="filters" role="toolbar" aria-label="Filter projects by category"></div>
+      <p class="count" id="projectCount" aria-live="polite"></p>
+      <div class="projects" id="projectList"></div>
     </section>
 
-    <!-- skills -->
     <section id="skills" class="reveal" aria-labelledby="skillsTitle">
-      <p class="eyebrow">Skills</p>
+      <p class="eyebrow">skills</p>
       <h2 class="title" id="skillsTitle">Technical skills</h2>
-      <div class="skills">
-        <div class="skill card"><h3>Languages</h3><ul><li>Python</li><li>Java</li><li>JavaScript</li><li>SQL</li><li>HTML/CSS</li></ul></div>
-        <div class="skill card"><h3>Backend and APIs</h3><ul><li>Flask</li><li>REST API design</li><li>JWT auth</li><li>RBAC</li><li>SMTP email</li></ul></div>
-        <div class="skill card"><h3>Databases</h3><ul><li>PostgreSQL</li><li>SQLite</li><li>Schema design</li><li>Indexes and constraints</li><li>Write locks</li></ul></div>
-        <div class="skill card"><h3>Data and ML</h3><ul><li>pandas</li><li>NumPy</li><li>scikit-learn</li><li>TF-IDF</li><li>Cross-validation</li></ul></div>
-        <div class="skill card"><h3>Algorithms</h3><ul><li>Dijkstra</li><li>Binary heaps</li><li>Alpha-beta search</li><li>Zobrist hashing</li><li>Interval scheduling</li></ul></div>
-        <div class="skill card"><h3>Computer vision</h3><ul><li>OpenCV</li><li>LBPH recognition</li><li>YuNet detection</li><li>MediaPipe</li><li>Liveness checks</li></ul></div>
-        <div class="skill card"><h3>Geospatial and real-time</h3><ul><li>GTFS</li><li>GTFS-realtime</li><li>Protobuf</li><li>Leaflet</li><li>OpenStreetMap</li></ul></div>
-        <div class="skill card"><h3>Testing and tooling</h3><ul><li>pytest</li><li>Playwright</li><li>GitHub Actions</li><li>Coverage</li><li>Web Workers</li></ul></div>
-      </div>
+      <div class="skills" id="skillList"></div>
     </section>
 
-    <!-- contact -->
-    <div class="contact card reveal" id="contact">
-      <div>
-        <h2>Let's talk</h2>
-        <p>I'm looking for Summer 2027 internships in software engineering, AI/ML or data, and happy to talk about any of these projects.</p>
+    <section id="contact" aria-labelledby="contactTitle">
+      <p class="eyebrow">contact</p>
+      <h2 class="title" id="contactTitle">Get in touch</h2>
+      <div class="contact card reveal">
+        <div>
+          <h3>Let's talk</h3>
+          <p>I'm looking for Summer 2027 internships in software engineering, AI/ML or data, and happy to talk about any of these projects.</p>
+          <div class="cta" id="contactLinks"></div>
+        </div>
+        <form id="contactForm" novalidate aria-describedby="formStatus">
+          <div class="field"><label for="cfName">Name</label><input id="cfName" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="cfEmail">Your email</label><input id="cfEmail" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="cfMessage">Message</label><textarea id="cfMessage" name="message" required></textarea></div>
+          <div class="cta"><button class="btn primary" type="submit">Write the email</button></div>
+          <p class="form-status" id="formStatus" role="status"></p>
+        </form>
       </div>
-      <div class="cta">
-        <a class="btn primary" href="mailto:zhang.l17@northeastern.edu">Email me</a>
-        <a class="btn" href="https://www.linkedin.com/in/luke-zhang-nu/">LinkedIn</a>
-        <a class="btn" href="https://github.com/luke-zhang-cs-py">GitHub</a>
-      </div>
-    </div>
+    </section>
   </div>
 </main>
 
@@ -478,29 +333,272 @@
   </div>
 </footer>
 
+<dialog class="palette" id="palette" aria-label="Command palette">
+  <input id="paletteInput" type="text" role="combobox" aria-expanded="true" aria-controls="paletteList" aria-autocomplete="list"
+         placeholder="Jump to a section or project, or type a command" autocomplete="off" spellcheck="false">
+  <ul id="paletteList" role="listbox" aria-label="Commands"></ul>
+  <p class="empty" id="paletteEmpty" hidden>Nothing matches.</p>
+  <footer><kbd>↑</kbd> <kbd>↓</kbd> to move · <kbd>Enter</kbd> to go · <kbd>Esc</kbd> to close</footer>
+</dialog>
+
 <script>
+  // ======================================================================
+  // CONTENT. Everything the page shows is here; edit these, not the markup.
+  // ======================================================================
+
+  var PROFILE = {
+    name: 'Luke Zhang',
+    initials: 'LZ',
+    photo: null,   // [path to a square photo, e.g. 'me.jpg'; until then the initials are shown]
+    role: '<strong>Computer Science and Business Administration</strong> at Northeastern University. Backend, data and machine learning.',
+    lede: 'I build systems that can show their working: every project below has a live demo that runs in your browser, a write-up of how it works and what went wrong, and a test suite that checks its own published numbers.',
+    bio: [
+      "I'm a first-year <strong>Computer Science and Business Administration</strong> student starting at Northeastern University in January 2027 on a Dean's Scholarship, after a semester at Queen's University Belfast.",
+      'My work sits where software meets measurement: <strong>routing and search</strong>, <strong>backend systems</strong>, and <strong>machine learning</strong> that has been benchmarked for fairness. Each project ships with a test suite, a browser demo and an honest account of its limits.',
+      "I'm looking for <strong>Summer 2027 internships</strong> in software engineering, AI/ML or data."
+    ],
+    focus: [
+      ['Backend and APIs', 'Flask REST APIs, JWT and role-based access, relational schema design'],
+      ['Data and evaluation', 'pandas pipelines, reproducible benchmarks, statistical agreement'],
+      ['Machine learning and vision', 'scikit-learn, OpenCV, fairness benchmarking'],
+      ['Algorithms', 'shortest paths, game-tree search, scheduling']
+    ],
+    links: [
+      { label: 'GitHub', url: 'https://github.com/luke-zhang-cs-py', icon: 'github' },
+      { label: 'LinkedIn', url: 'https://www.linkedin.com/in/luke-zhang-nu/', icon: 'linkedin' },
+      { label: 'Email', url: 'mailto:zhang.l17@northeastern.edu', icon: 'mail' }
+    ],
+    email: 'zhang.l17@northeastern.edu'
+  };
+
+  var PAGES = 'https://luke-zhang-cs-py.github.io/';
+  var REPO = 'https://github.com/luke-zhang-cs-py/';
+
+  // In impact: data-tests marks the project's own test count, which the hero adds up; data-derived
+  // marks a figure that is a sum of several in the project's README, so the page's figure check skips it.
+  var PROJECTS = [
+    {
+      id: 'transit', featured: true, title: 'Toronto Transit Reach', kind: 'Routing · geospatial', since: '2026-07', dates: 'Jul 2026 – Present',
+      categories: ['Algorithms', 'Backend', 'Geospatial'],
+      summary: "An isochrone map and time-dependent trip planner for Toronto: click anywhere and see how far you can get in 30 minutes, over the TTC's own timetable and live feed.",
+      problem: "Transit maps show lines, not time. You can't see how far 30 minutes gets you from a given corner of Toronto, or when you'd really arrive.",
+      approach: "A weighted multi-modal graph searched with Dijkstra over the TTC's GTFS timetable and live GTFS-realtime feed. Every wait says whether it's timetabled, measured live or modelled, and closed lines drop out of the graph.",
+      result: 'Reach from any point is computed live in the page: 247 stops within an hour of one start. The browser build is checked stop by stop against the Python and refuses to publish on any disagreement.',
+      features: [
+        "Shortest-path routing with Dijkstra's algorithm over a weighted multi-modal graph (adjacency list, binary heap).",
+        'Every wait is labelled by source: the next timetabled departure, half the live observed headway, or a modelled figure.',
+        'Live service alerts remove closed lines from the graph, so trips route around them.',
+        'The browser demo is a JavaScript port of the Python search; the build refuses to publish if they disagree at any stop.'
+      ],
+      impact: [{ html: '<b>516</b> stops verified Python vs JS' }, { html: '<b data-tests>235</b> tests · <b>100%</b> coverage' }],
+      tags: ['Python', 'Flask', 'REST API', 'Leaflet', 'GTFS-realtime', 'JavaScript'],
+      demo: PAGES + 'Toronto-Transit-Distance-Matrix/app/',
+      more: [{ label: 'Write-up', url: PAGES + 'Toronto-Transit-Distance-Matrix/' }],
+      source: REPO + 'Toronto-Transit-Distance-Matrix',
+      gif: { src: PAGES + 'Toronto-Transit-Distance-Matrix/demo.gif', w: 760, h: 478,
+             alt: 'Dragging the time filter from 5 to 60 minutes: the reach spreads from a single stop to 247 of them, 30 km out' }
+    },
+    {
+      id: 'almanac', title: 'Almanac', kind: 'Full stack · scheduling', since: '2026-08', dates: 'Aug 2026 – Present',
+      categories: ['Backend', 'Full stack'],
+      summary: "A calendar and the multi-role booking platform behind it: clients book a provider's free slots, and invites become bookings without the guest making an account.",
+      features: [
+        'RESTful API with JWT authentication and role-based access control for clients, providers and admins.',
+        "Relational schema on SQLite or PostgreSQL; a table lock and a partial unique index mean two people racing for one time can't both win it.",
+        'Availability computed from recurring weekly hours, blocked dates and bookings; five kinds of email, each sent exactly once.',
+        'Refuses to start in production with the committed development secret that signs every session.'
+      ],
+      impact: [{ html: '<b data-tests>527</b> tests · <b>100%</b> of 1,971 statements' }, { html: '<b>21</b> scenarios verified Python vs JS' }],
+      tags: ['Python', 'Flask', 'JWT', 'RBAC', 'PostgreSQL', 'SQLite', 'SMTP'],
+      demo: PAGES + 'Almanac-Main-Full-Stack-Calendar/app/',
+      more: [{ label: 'Blank calendar', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/calendar.html' }, { label: 'Write-up', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/' }],
+      source: REPO + 'Almanac-Main-Full-Stack-Calendar',
+      gif: { src: PAGES + 'Almanac-Main-Full-Stack-Calendar/demo.gif', w: 900, h: 700,
+             alt: 'Five set-ups running through the same slot engine: a full week, a block that clips one slot, an afternoon blocked off, a day booked solid, and today with the morning gone' }
+    },
+    {
+      id: 'chess', title: 'Dvoretsky Lab', kind: 'Game engine · search', since: '2026-09', dates: 'Sep 2026 – Present',
+      categories: ['Algorithms', 'Frontend'],
+      summary: "A chess training room built from one player's own Lichess games: an opponent that plays like you, drills cut from your mistakes, and Stockfish grading every move.",
+      features: [
+        'A chess engine from scratch: 0x88 move generation, alpha-beta with quiescence, a Zobrist transposition table and null-move pruning.',
+        "A \"mirror\" opponent that loses centipawns at the player's own rate and answers from their opening repertoire.",
+        'Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.',
+        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines."
+      ],
+      impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+41</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
+               { html: '<b data-tests data-derived title="67 regression, 39 rules, 38 browser and 40 perft checks">184</b> checks' }],
+      tags: ['JavaScript', 'Web Workers', 'Stockfish', 'UCI', 'Lichess API', 'Playwright'],
+      demo: PAGES + 'Dvoerstky-AI-Chess-Coach/',
+      more: [{ label: 'Guide', url: REPO + 'Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md' }],
+      source: REPO + 'Dvoerstky-AI-Chess-Coach',
+      gif: { src: PAGES + 'Dvoerstky-AI-Chess-Coach/docs/demo.gif', w: 960, h: 795,
+             alt: 'The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder' }
+    },
+    {
+      id: 'faces', title: 'Face Recognition Attendance', kind: 'Computer vision · fairness', since: '2026-08', dates: 'Aug 2026 – Present',
+      categories: ['Computer vision', 'Machine learning', 'Backend'],
+      summary: 'A local attendance system: OpenCV reads the webcam, recognises enrolled faces and logs attendance to SQLite. No face data leaves the machine.',
+      features: [
+        'Detection, LBPH recognition, liveness checks and quality scoring, with a CLI for register, train, run and report.',
+        'Benchmarked on all of FairFace: a brightness-based quality gate flagged 38.8% of Black faces against 18.5% of White faces, and was rebuilt to be scale-free.',
+        'Match thresholds calibrated by gallery size over 4.77 billion impostor pairs, since a fixed cut fails as enrolment grows.'
+      ],
+      impact: [{ html: '<b>97,698</b> faces benchmarked' }, { html: 'detection <b>99.95%</b>' }, { html: 'bias <b>2.15×</b> → <b>1.24×</b>' }, { html: '<b data-tests>403</b> tests' }],
+      tags: ['Python', 'OpenCV', 'Flask', 'SQLite', 'MediaPipe'],
+      demo: PAGES + 'Facial-Recognition-Software/camera/',
+      more: [{ label: 'Write-up', url: PAGES + 'Facial-Recognition-Software/' }],
+      source: REPO + 'Facial-Recognition-Software',
+      gif: { src: PAGES + 'Facial-Recognition-Software/demo.gif', w: 900, h: 570,
+             alt: 'A face tracked live: the instruction changes from No face detected to Move closer to Head upright to Ready, then a second person appears and the verdict becomes One person only' }
+    },
+    {
+      id: 'spam', title: 'AI Spam Message Classifier', kind: 'Machine learning · NLP', since: '2026-07', dates: 'Jul 2026 – Present',
+      categories: ['Machine learning', 'Backend'],
+      summary: 'Spam or not, and which words drove the call, with the trained model exported into the page so nothing is uploaded.',
+      features: [
+        'TF-IDF over unigrams and bigrams, keeping the kind of each noisy token (links, money, short codes) rather than deleting it.',
+        'Naive Bayes and logistic regression compared on out-of-fold predictions, with the vectoriser refitted inside every fold.',
+        'Decision threshold chosen for the best F1 with precision held at 0.90, and saved inside the model artifact.'
+      ],
+      impact: [{ html: 'F1 <b>0.850</b> at precision <b>0.90</b>' }, { html: '<b data-tests>153</b> tests · <b>100%</b> coverage' }],
+      tags: ['Python', 'scikit-learn', 'pandas', 'Flask', 'JavaScript'],
+      demo: PAGES + 'AI-Spam-Message-Classifier/app/',
+      more: [{ label: 'Write-up', url: PAGES + 'AI-Spam-Message-Classifier/' }],
+      source: REPO + 'AI-Spam-Message-Classifier',
+      gif: { src: PAGES + 'AI-Spam-Message-Classifier/demo.gif', w: 720, h: 653,
+             alt: 'Classifying three messages: a lunch text comes back HAM, a prize message SPAM, and a competition text SPAM at 79.1%, with the words ranked by how much each pushed the verdict' }
+    },
+    {
+      id: 'tally', title: 'Tally', kind: 'Mobile-first · product', since: '2026-09', dates: 'Sep 2026',
+      categories: ['Frontend', 'Backend'],
+      summary: 'A phone-first expense tracker for the seconds after you spend: tap an amount, tap a category, done.',
+      features: [
+        'A till-style keypad: digits shift in from the right, so there is no decimal point to place.',
+        'Anything bought three or more times in 90 days becomes a one-tap button carrying its amount and category.',
+        'Money stored as integer cents, and currencies never summed without a rate.',
+        'Local only: no account, no bank connection; exports CSV for reconciliation.'
+      ],
+      impact: [{ html: '<b>2</b> taps for a regular purchase' }, { html: '<b data-tests>210</b> tests' }],
+      tags: ['Python', 'Flask', 'SQLite', 'JavaScript'],
+      demo: PAGES + 'tally/app/',
+      more: [{ label: 'Write-up', url: PAGES + 'tally/' }],
+      source: REPO + 'tally',
+      gif: { src: PAGES + 'tally/demo.gif', w: 470, h: 903,
+             alt: "Tapping 3, 5, 0 so the amount shifts in from the right as 3.50, choosing Coffee, saving, then a second entry, the day's total climbing to 15.90 euros" }
+    }
+  ];
+
+  var SKILLS = [
+    ['Languages', ['Python', 'Java', 'JavaScript', 'SQL', 'HTML/CSS']],
+    ['Backend and APIs', ['Flask', 'REST API design', 'JWT auth', 'RBAC', 'SMTP email']],
+    ['Databases', ['PostgreSQL', 'SQLite', 'Schema design', 'Indexes and constraints', 'Write locks']],
+    ['Data and ML', ['pandas', 'NumPy', 'scikit-learn', 'TF-IDF', 'Cross-validation']],
+    ['Algorithms', ['Dijkstra', 'Binary heaps', 'Alpha-beta search', 'Zobrist hashing', 'Interval scheduling']],
+    ['Computer vision', ['OpenCV', 'LBPH recognition', 'YuNet detection', 'MediaPipe', 'Liveness checks']],
+    ['Geospatial and real-time', ['GTFS', 'GTFS-realtime', 'Protobuf', 'Leaflet', 'OpenStreetMap']],
+    ['Testing and tooling', ['pytest', 'Playwright', 'GitHub Actions', 'Coverage', 'Web Workers']]
+  ];
+
+  // ======================================================================
+  // RENDERING. The layout below turns the content above into the page.
+  // ======================================================================
   (function () {
     var root = document.documentElement;
+    var $ = function (id) { return document.getElementById(id); };
+    function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+    var STILL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';   // a 1x1 transparent GIF
+    var ICONS = {
+      github: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>',
+      linkedin: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>',
+      mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>'
+    };
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // ---- theme: dark until the visitor chooses light, then whatever they chose
-    var btn = document.getElementById('themeBtn');
-    function applyTheme(theme) {
-      root.dataset.theme = theme;
-      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
-      // the browser's own toolbar colour follows the page, not just the system setting
-      var bg = getComputedStyle(root).getPropertyValue('--bg').trim();
-      document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = bg; });
+    // ---- hero, about, contact links
+    function linkButtons(primary) {
+      return (primary ? '<a class="btn primary" href="#projects">View my work</a>' : '') + PROFILE.links.map(function (l) {
+        return '<a class="btn" href="' + esc(l.url) + '"' + (l.icon === 'mail' ? '' : ' rel="me"') + '>' + ICONS[l.icon] + esc(l.label) + '</a>';
+      }).join('');
     }
-    applyTheme(root.dataset.theme);
-    btn.addEventListener('click', function () {
-      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      try { localStorage.setItem('theme', next); } catch (e) { /* not remembered */ }
-      applyTheme(next);
+    $('heroRole').innerHTML = PROFILE.role;
+    $('heroLede').textContent = PROFILE.lede;
+    $('heroLinks').innerHTML = linkButtons(true);
+    $('contactLinks').innerHTML = linkButtons(false);
+    $('avatar').innerHTML = PROFILE.photo ? '<img src="' + esc(PROFILE.photo) + '" alt="' + esc(PROFILE.name) + '">' : '<span aria-hidden="true">' + esc(PROFILE.initials) + '</span>';
+    $('bio').innerHTML = PROFILE.bio.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+    $('focus').innerHTML = PROFILE.focus.map(function (f) { return '<li class="card"><b>' + esc(f[0]) + '</b><span>' + esc(f[1]) + '</span></li>'; }).join('');
+
+    // ---- the headline figures are counted from the projects, never typed in
+    var totalTests = 0;
+    var holder = document.createElement('div');
+    PROJECTS.forEach(function (p) {
+      holder.innerHTML = p.impact.map(function (i) { return i.html; }).join(' ');
+      var b = holder.querySelector('[data-tests]');
+      if (b) totalTests += +b.textContent.replace(/,/g, '');
     });
+    $('stats').innerHTML = [
+      [PROJECTS.length, 'open-source projects'],
+      [PROJECTS.filter(function (p) { return p.demo; }).length, 'live demos, no install'],
+      [totalTests.toLocaleString('en-US'), 'automated tests and checks', ' data-tests-total'],
+      ['MIT', 'licensed, CI on every push']
+    ].map(function (s) { return '<div class="card"><b' + (s[2] || '') + '>' + s[0] + '</b><span>' + s[1] + '</span></div>'; }).join('');
+
+    // ---- projects
+    function demo(p) {
+      return '<div class="shot"><picture><source media="(prefers-reduced-motion: reduce)" srcset="' + STILL + '">' +
+        '<img src="' + esc(p.gif.src) + '" width="' + p.gif.w + '" height="' + p.gif.h + '" loading="lazy" alt="' + esc(p.gif.alt) + '"></picture>' +
+        '<button class="play" type="button" style="--ratio:' + p.gif.w + '/' + p.gif.h + '" hidden>▶ Play demo</button></div>';
+    }
+    function card(p) {
+      var list = function (items, cls, label) { return '<ul class="' + cls + '" aria-label="' + label + '">' + items + '</ul>'; };
+      var body = '<p class="meta"><span class="kind">' + esc(p.kind) + '</span><time datetime="' + p.since + '">' + esc(p.dates) + '</time></p>' +
+        '<h3 id="h-' + p.id + '">' + esc(p.title) + '</h3><p class="pitch">' + esc(p.summary) + '</p>';
+      if (p.featured) {
+        body += '<dl class="case">' + [['Problem', p.problem], ['Approach', p.approach], ['Result', p.result]].map(function (c) {
+          return '<div><dt>' + c[0] + '</dt><dd>' + esc(c[1]) + '</dd></div>'; }).join('') + '</dl>';
+      }
+      body += '<details class="inside"><summary>What\'s inside</summary><ul>' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></details>' +
+        list(p.impact.map(function (i) { return '<li>' + i.html + '</li>'; }).join(''), 'impact', 'Results') +
+        list(p.tags.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join(''), 'tags', 'Technologies') +
+        '<div class="links"><a class="btn primary" href="' + esc(p.demo) + '">Live demo</a>' +
+        p.more.map(function (m) { return '<a class="btn" href="' + esc(m.url) + '">' + esc(m.label) + '</a>'; }).join('') +
+        '<a class="btn" href="' + esc(p.source) + '">Source</a></div>';
+      return '<article class="reveal project' + (p.featured ? ' featured' : '') + '" id="' + p.id + '" aria-labelledby="h-' + p.id + '" data-categories="' +
+        esc(p.categories.join('|')) + '">' + demo(p) + '<div class="body">' + body + '</div></article>';
+    }
+    $('projectList').innerHTML = PROJECTS.filter(function (p) { return p.featured; }).map(card).join('') +
+      '<div class="grid">' + PROJECTS.filter(function (p) { return !p.featured; }).map(card).join('') + '</div>';
+
+    // ---- the category filter
+    var categories = [];
+    PROJECTS.forEach(function (p) { p.categories.forEach(function (c) { if (categories.indexOf(c) < 0) categories.push(c); }); });
+    categories.sort();
+    $('filters').innerHTML = ['All'].concat(categories).map(function (c) {
+      return '<button class="chip" type="button" data-filter="' + esc(c) + '" aria-pressed="' + (c === 'All') + '">' + esc(c) + '</button>';
+    }).join('');
+    function applyFilter(category) {
+      var shown = 0;
+      document.querySelectorAll('.project').forEach(function (a) {
+        var match = category === 'All' || a.dataset.categories.split('|').indexOf(category) > -1;
+        a.hidden = !match;
+        if (match) { shown++; a.classList.add('in'); }
+      });
+      document.querySelectorAll('.chip').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.filter === category)); });
+      $('projectCount').textContent = category === 'All' ? PROJECTS.length + ' projects'
+        : 'Showing ' + shown + ' of ' + PROJECTS.length + ' projects in ' + category;
+    }
+    $('filters').addEventListener('click', function (e) { var b = e.target.closest('.chip'); if (b) applyFilter(b.dataset.filter); });
+    applyFilter('All');
+
+    // ---- skills
+    $('skillList').innerHTML = SKILLS.map(function (s) {
+      return '<div class="skill card"><h3>' + esc(s[0]) + '</h3><ul>' + s[1].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>';
+    }).join('');
 
     // ---- demo GIFs: <picture> already chose a blank still for visitors who ask for less
     // motion; Play takes that choice away, so the GIF loads.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reducedMotion) {
       document.querySelectorAll('.shot').forEach(function (shot) {
         var img = shot.querySelector('img'), still = shot.querySelector('source'), play = shot.querySelector('.play');
         shot.classList.add('reduced');
@@ -510,11 +608,124 @@
       });
     }
 
+    // ---- theme: dark until the visitor chooses light, then whatever they chose
+    var themeBtn = $('themeBtn');
+    function applyTheme(theme) {
+      root.dataset.theme = theme;
+      themeBtn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+      // the browser's own toolbar colour follows the page
+      var bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+      document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = bg; });
+    }
+    function toggleTheme() {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem('theme', next); } catch (e) { /* not remembered */ }
+      applyTheme(next);
+    }
+    applyTheme(root.dataset.theme);
+    themeBtn.addEventListener('click', toggleTheme);
+
+    // ---- contact: a front-end-only form that hands a finished email to the visitor's mail app
+    var form = $('contactForm'), formStatus = $('formStatus');
+    var EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var fields = { name: $('cfName'), email: $('cfEmail'), message: $('cfMessage') };
+      var bad = Object.keys(fields).filter(function (k) {
+        var v = fields[k].value.trim();
+        return !v || (k === 'email' && !EMAIL_SHAPE.test(v));
+      });
+      Object.keys(fields).forEach(function (k) { fields[k].setAttribute('aria-invalid', String(bad.indexOf(k) > -1)); });
+      if (bad.length) {
+        formStatus.dataset.kind = 'error';
+        formStatus.textContent = bad.indexOf('email') > -1 && fields.email.value.trim() ? 'That email address looks incomplete.' : 'Please fill in your name, email and message.';
+        fields[bad[0]].focus();
+        return;
+      }
+      var subject = 'Portfolio: message from ' + fields.name.value.trim();
+      var body = fields.message.value.trim() + '\n\n-- ' + fields.name.value.trim() + ' (' + fields.email.value.trim() + ')';
+      formStatus.dataset.kind = 'ok';
+      formStatus.textContent = "Your email app should open with this message. If it doesn't, write to " + PROFILE.email + '.';
+      form.dataset.mailto = 'mailto:' + PROFILE.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = form.dataset.mailto;
+    });
+
+    // ---- the command palette: Ctrl/Cmd+K or "/" from anywhere
+    var palette = $('palette'), input = $('paletteInput'), listEl = $('paletteList');
+    function go(id) { return function () { var el = $(id); el.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' }); el.classList.add('in'); }; }
+    var COMMANDS = [
+      { label: 'About', hint: 'section', run: go('about') },
+      { label: 'Projects', hint: 'section', run: go('projects') },
+      { label: 'Skills', hint: 'section', run: go('skills') },
+      { label: 'Contact', hint: 'section', run: go('contact') }
+    ].concat(PROJECTS.map(function (p) {
+      return { label: p.title, hint: 'project', keywords: p.tags.concat(p.categories).join(' '), run: function () { applyFilter('All'); go(p.id)(); } };
+    }), PROJECTS.map(function (p) {
+      return { label: 'Open the ' + p.title + ' demo', hint: 'live demo', keywords: p.tags.join(' '), run: function () { window.location.href = p.demo; } };
+    }), [
+      { label: 'Switch theme', hint: 'command', keywords: 'dark light mode', run: toggleTheme },
+      { label: 'Copy my email address', hint: 'command', keywords: 'contact mail', run: function () {
+          if (navigator.clipboard) navigator.clipboard.writeText(PROFILE.email).catch(function () {});
+          formStatus.dataset.kind = 'ok'; formStatus.textContent = 'Copied ' + PROFILE.email + '.'; } },
+      { label: 'Open GitHub', hint: 'link', run: function () { window.location.href = PROFILE.links[0].url; } },
+      { label: 'Open LinkedIn', hint: 'link', run: function () { window.location.href = PROFILE.links[1].url; } }
+    ]);
+    var matches = [], active = 0, opener = null;
+    function renderPalette() {
+      var q = input.value.trim().toLowerCase();
+      matches = COMMANDS.filter(function (c) { return !q || (c.label + ' ' + (c.keywords || '') + ' ' + c.hint).toLowerCase().indexOf(q) > -1; });
+      active = Math.min(active, Math.max(matches.length - 1, 0));
+      listEl.innerHTML = matches.map(function (c, i) {
+        return '<li role="option" id="cmd-' + i + '" aria-selected="' + (i === active) + '">' + esc(c.label) + '<span>' + esc(c.hint) + '</span></li>';
+      }).join('');
+      $('paletteEmpty').hidden = matches.length > 0;
+      if (matches.length) input.setAttribute('aria-activedescendant', 'cmd-' + active); else input.removeAttribute('aria-activedescendant');
+      var sel = $('cmd-' + active);
+      if (sel) sel.scrollIntoView({ block: 'nearest' });
+    }
+    function openPalette() {
+      if (palette.open) return;
+      opener = document.activeElement;
+      input.value = ''; active = 0; renderPalette();
+      palette.showModal(); input.focus();
+    }
+    function closePalette() { if (palette.open) palette.close(); }
+    function run(i) { var c = matches[i]; if (!c) return; closePalette(); c.run(); }
+    palette.addEventListener('close', function () { if (opener && opener.focus) opener.focus(); });
+    $('paletteBtn').addEventListener('click', openPalette);
+    input.addEventListener('input', function () { active = 0; renderPalette(); });
+    input.addEventListener('keydown', function (e) {
+      var n = Math.max(matches.length, 1);
+      if (e.key === 'ArrowDown') { e.preventDefault(); active = (active + 1) % n; renderPalette(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); active = (active - 1 + n) % n; renderPalette(); }
+      else if (e.key === 'Enter') { e.preventDefault(); run(active); }
+    });
+    listEl.addEventListener('click', function (e) { var li = e.target.closest('li'); if (li) run(+li.id.slice(4)); });
+    palette.addEventListener('click', function (e) { if (e.target === palette) closePalette(); });   // a click on the backdrop
+    document.addEventListener('keydown', function (e) {
+      var typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName);
+      if ((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); if (palette.open) closePalette(); else openPalette(); }
+      else if (e.key === '/' && !typing && !palette.open) { e.preventDefault(); openPalette(); }
+    });
+
+    // ---- sections ease in as they reach the viewport; everything is simply shown when motion
+    // is unwelcome or the browser can't watch for it
+    var reveals = [].slice.call(document.querySelectorAll('.reveal'));
+    function show(el) { el.classList.add('in'); }
+    if (!('IntersectionObserver' in window) || reducedMotion) {
+      reveals.forEach(show);
+    } else {
+      var watcher = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) { show(e.target); watcher.unobserve(e.target); } });
+      }, { rootMargin: '0px 0px -8% 0px' });
+      reveals.forEach(function (el) { watcher.observe(el); });
+    }
+
     // ---- the nav marks the section being read: the last one whose top has passed a line
     // a third of the way down, or the last section once the page can scroll no further.
     // The sections are the nav's own targets, so adding a link is the only change needed.
     var links = [].slice.call(document.querySelectorAll('.bar nav a'));
-    var sections = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+    var sections = links.map(function (a) { return $(a.getAttribute('href').slice(1)); });
     var READING_LINE = 1 / 3;
     // The last sections are too short to reach the reading line, so at the foot of the page the
     // one a visitor clicked stays marked while it's on screen; otherwise the last section is.
@@ -530,19 +741,6 @@
         if (i === current) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
       });
     }
-    // ---- sections ease in as they reach the viewport; everything is simply shown when motion
-    // is unwelcome or the browser can't watch for it
-    var reveals = [].slice.call(document.querySelectorAll('.reveal'));
-    function show(el) { el.classList.add('in'); }
-    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      reveals.forEach(show);
-    } else {
-      var watcher = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { if (e.isIntersecting) { show(e.target); watcher.unobserve(e.target); } });
-      }, { rootMargin: '0px 0px -8% 0px' });
-      reveals.forEach(function (el) { watcher.observe(el); });
-    }
-
     var queued = false;
     window.addEventListener('scroll', function () {
       if (queued) return;
@@ -553,5 +751,6 @@
     markCurrent();
   })();
 </script>
+<noscript><p style="text-align:center;padding:24px">The project list is built by a script. Every project is also on <a href="https://github.com/luke-zhang-cs-py">GitHub</a>.</p></noscript>
 </body>
 </html>
