@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Luke Zhang · Software Engineering Portfolio</title>
-<meta name="description" content="Luke Zhang, Computer Science and Business Administration student at Northeastern University. Backend, data and machine-learning projects, each with a live demo: transit routing, a booking platform, a chess engine, face recognition, a spam classifier and an expense tracker.">
+<meta name="description" content="Luke Zhang, Computer Science and Business Administration student at Northeastern University. Backend, data and machine-learning projects, each with a live demo: transit routing, a booking platform, a chess engine, face recognition, a spam classifier, a currency-aware budget and an expense tracker.">
 <meta name="author" content="Luke Zhang">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: https://luke-zhang-cs-py.github.io; base-uri 'none'; form-action 'none'">
 <link rel="canonical" href="https://luke-zhang-cs-py.github.io/">
@@ -468,6 +468,24 @@
       source: REPO + 'AI-Spam-Message-Classifier',
       gif: { src: PAGES + 'AI-Spam-Message-Classifier/demo.gif', w: 720, h: 653,
              alt: 'Classifying three messages: a lunch text comes back HAM, a prize message SPAM, and a competition text SPAM at 79.1%, with the words ranked by how much each pushed the verdict' }
+    },
+    {
+      id: 'wallet', title: 'Wallet FX', kind: 'Finance · data', since: '2026-09', dates: 'Sep 2026',
+      categories: ['Backend', 'Data'],
+      summary: "Euro spending converted to CAD and USD at the rate the European Central Bank published on the day of each purchase, showing what the card's markup really cost.",
+      features: [
+        "Each purchase is converted at its own day's ECB rate; on weekends and holidays it walks back to the last published day and records the lag, and never reaches forward.",
+        "Compares the card's bill with the ECB rate, so a hidden 2.5% conversion fee shows up on every purchase.",
+        'Imports from a synced folder, QFX, a CSV in any layout, or a receipt screenshot read by local OCR, and refuses a row rather than guess its currency.',
+        'Four layered packages, with the layering asserted by a test instead of left to convention.'
+      ],
+      impact: [{ html: 'card markup <b>2.49%</b> made visible' }, { html: '<b data-tests>904</b> tests · <b>100%</b> coverage' }],
+      tags: ['Python', 'Flask', 'SQLite', 'OCR', 'JavaScript'],
+      demo: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/app/',
+      more: [{ label: 'Receipt capture', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/capture/' }, { label: 'Write-up', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/' }],
+      source: REPO + 'Budgeting-EU-US-CAN-Almanac-Branch',
+      gif: { src: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/demo.gif', w: 860, h: 552,
+             alt: "Four purchases landing one at a time, each converted at the rate published on the day it was spent; the Sunday purchase is marked as using Friday's rate, two days back" }
     },
     {
       id: 'tally', title: 'Tally', kind: 'Mobile-first · product', since: '2026-09', dates: 'Sep 2026',

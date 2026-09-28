@@ -20,7 +20,7 @@ PAGE = (ROOT / "index.html").as_uri()
 SECTIONS = ["about", "projects", "skills", "contact"]
 SKILL_BLOCKS = 8
 WIDTHS = (1280, 820, 390, 360)
-DEMOS = 6
+DEMOS = 7
 NETWORK_CHECKS = 3          # the W3C validator, figures against the READMEs, and outbound links
 OFFLINE = "--offline" in sys.argv
 SHOTS = sys.argv[sys.argv.index("--shots") + 1] if "--shots" in sys.argv else None
@@ -176,7 +176,7 @@ def check_structure(pg):
     check("no Experience or Education section", pg.locator("#experience, .job, #education, .school").count() == 0)
     check("eight skill blocks, each with a heading and at least four skills",
           pg.locator(".skill").count() == SKILL_BLOCKS and pg.evaluate("[...document.querySelectorAll('.skill')].every(s => s.querySelector('h3') && s.querySelectorAll('li').length >= 4)"))
-    check("six projects, each with a live demo, a write-up or guide, and its source",
+    check("seven projects, each with a live demo, a write-up or guide, and its source",
           pg.locator(".project").count() == DEMOS and pg.evaluate("""[...document.querySelectorAll('.project')].every(p => {
               const hrefs = [...p.querySelectorAll('.links a')].map(a => a.href);
               return p.querySelector('.links .btn.primary') && hrefs.some(h => /github\\.com\\/luke-zhang-cs-py\\/[^/]+$/.test(h)) && hrefs.length >= 3; })"""))
@@ -199,7 +199,7 @@ def check_components(pg):
     pg.click('.chip[data-filter="Computer vision"]')
     cv, count = visible(), pg.text_content("#projectCount")
     pg.click('.chip[data-filter="All"]')
-    check("the filter shows only a category's projects, and says how many", cv == ["faces"] and "1 of 6" in count and len(visible()) == DEMOS, (cv, count))
+    check("the filter shows only a category's projects, and says how many", cv == ["faces"] and "1 of 7" in count and len(visible()) == DEMOS, (cv, count))
     check("the pressed filter is announced as pressed", pg.get_attribute('.chip[data-filter="All"]', "aria-pressed") == "true")
 
     pg.keyboard.press("Control+k")
