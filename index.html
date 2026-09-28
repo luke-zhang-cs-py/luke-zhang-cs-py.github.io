@@ -373,7 +373,7 @@
     school: 'Northeastern University',
     program: 'CS and Business Administration',
     status: 'Open to Summer 2027 internships',
-    role: '<strong>Computer Science and Business Administration</strong> at Northeastern University. Backend, data and machine learning.',
+    role: '<strong>Computer Science and Business Administration</strong> at Northeastern University. Backend, data, machine learning, and Python + AI.',
     lede: 'I build systems that can show their working: every project below has a live demo that runs in your browser, a write-up of how it works and what went wrong, and a test suite that checks its own published numbers.',
     bio: [
       "I'm a first-year <strong>Computer Science and Business Administration</strong> student starting at Northeastern University in January 2027 on a Dean's Scholarship.",
@@ -580,9 +580,12 @@
       var b = holder.querySelector('[data-tests]');
       if (b) totalTests += +b.textContent.replace(/,/g, '');
     });
+    var tech = {};
+    PROJECTS.forEach(function (p) { p.tags.forEach(function (t) { tech[t] = true; }); });
+    var allDemo = PROJECTS.every(function (p) { return p.demo; });
     $('stats').innerHTML = [
-      [PROJECTS.length, 'open-source projects'],
-      [PROJECTS.filter(function (p) { return p.demo; }).length, 'live demos, no install'],
+      [PROJECTS.length, 'open-source projects' + (allDemo ? ' · live demos, no install' : '')],
+      [Object.keys(tech).length, 'technologies across the projects'],
       [totalTests.toLocaleString('en-US'), 'automated tests and checks', ' data-tests-total'],
       ['MIT', 'licensed, CI on every push']
     ].map(function (s) { return '<div class="card"><b' + (s[2] || '') + '>' + s[0] + '</b><span>' + s[1] + '</span></div>'; }).join('');
