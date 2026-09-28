@@ -2,9 +2,9 @@
 
     python tools/record_demo.py [url] [--out file.gif]      (default: the published site, docs/demo.gif)
 
-One browser, real waits: the page loads, scrolls from the introduction through the
-projects (pausing on each so its own demo GIF plays), switches to dark mode, and
-carries on to skills, education and contact. Frames are captured at 1280x800 and
+One browser, real waits, in dark mode throughout: the page loads, scrolls from the
+introduction through the projects (pausing on each so its own demo GIF plays and
+the cards ease in), and carries on to skills, education and contact. Frames are captured at 1280x800 and
 saved at 880x550.
 """
 import io, pathlib, sys
@@ -16,7 +16,7 @@ OUT = pathlib.Path(args.pop(args.index("--out") + 1)) if "--out" in args else pa
 args = [a for a in args if a != "--out"]
 URL = args[0] if args else "https://luke-zhang-cs-py.github.io/"
 SIZE = (880, 550)
-HOLD_MS = {"intro": 1600, "section": 1300, "theme": 1200, "end": 2000}   # how long each still is shown
+HOLD_MS = {"intro": 1600, "section": 1300, "end": 2000}   # how long each still is shown
 DEMO_FRAMES, DEMO_FRAME_MS = 4, 300    # frames captured on each project, so its own demo is seen playing
 frames = []   # (image, ms)
 
@@ -41,7 +41,7 @@ def dwell(pg, count, ms, gap=250):
 
 with sync_playwright() as pw:
     b = pw.chromium.launch()
-    pg = b.new_page(viewport={"width": 1280, "height": 800}, color_scheme="light")
+    pg = b.new_page(viewport={"width": 1280, "height": 800}, color_scheme="dark")
     pg.goto(URL, wait_until="networkidle")
     # let every demo GIF arrive before recording, so none appears half-loaded
     for y in range(0, pg.evaluate("document.body.scrollHeight"), 700):
@@ -51,11 +51,7 @@ with sync_playwright() as pw:
 
     grab(pg, HOLD_MS["intro"])
     glide(pg, top_of(pg, "#about")); dwell(pg, 1, HOLD_MS["section"])
-    for pid in ("#transit", "#almanac", "#chess"):
-        glide(pg, top_of(pg, pid, 90)); dwell(pg, DEMO_FRAMES, DEMO_FRAME_MS)
-    pg.click("#themeBtn"); pg.wait_for_timeout(300)
-    grab(pg, HOLD_MS["theme"])
-    for pid in ("#faces", "#spam", "#tally"):
+    for pid in ("#transit", "#almanac", "#chess", "#faces", "#spam", "#tally"):
         glide(pg, top_of(pg, pid, 90)); dwell(pg, DEMO_FRAMES, DEMO_FRAME_MS)
     glide(pg, top_of(pg, "#skills")); dwell(pg, 1, HOLD_MS["section"])
     glide(pg, pg.evaluate("document.body.scrollHeight - innerHeight")); dwell(pg, 1, HOLD_MS["end"])

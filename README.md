@@ -9,11 +9,10 @@ and links to its write-up and source.
 
 ### ▶ [Open the portfolio →](https://luke-zhang-cs-py.github.io/)
 
-![Scrolling the portfolio: the introduction, then Toronto Transit, Almanac and the chess coach with their demos playing, a switch to dark mode, then face recognition, the spam classifier, Tally, and the skills, education and contact sections](docs/demo.gif)
+![Scrolling the portfolio in dark mode: the introduction, then Toronto Transit, Almanac, the chess coach, face recognition, the spam classifier and Tally, each with its own demo playing, then skills, education and contact](docs/demo.gif)
 
-*Above: the live site, top to bottom. Each project's own demo plays inside its card, and the theme
-switches to dark halfway. Recorded from the published page by
-[`tools/record_demo.py`](tools/record_demo.py).*
+*Above: the live site in dark mode, top to bottom. Each project's own demo plays inside its card as
+the cards ease in. Recorded from the published page by [`tools/record_demo.py`](tools/record_demo.py).*
 
 If `github.io` is blocked on your network (some university wifi is), open [`index.html`](index.html) locally instead.
 
