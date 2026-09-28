@@ -302,6 +302,11 @@ def check_figures(api, cards):
     check("every figure on the page appears in its project's README (%d figures)" % sum(len(f) for _, f in cards), not missing, missing)
 
 
+# The Nu validator's CSS checker predates container queries (CSS Containment Level 3, in every
+# current browser since 2023) and reports the property and the at-rule as unknown. Only those.
+VALIDATOR_LAGS = re.compile(r"^CSS: (“container”: Property “container” doesn't exist|Unrecognized at-rule “@container”)")
+
+
 def check_valid_html(api):
     """The W3C Nu validator, on the page and the 404 page (both are public, so nothing is disclosed)."""
     errors = []
@@ -309,7 +314,8 @@ def check_valid_html(api):
         r = api.post("https://validator.w3.org/nu/?out=json", data=(ROOT / name).read_bytes(),
                      headers={"Content-Type": "text/html; charset=utf-8"}, timeout=30000)
         if r.status != 200: errors.append((name, "validator answered %s" % r.status)); continue
-        errors += [(name, m.get("lastLine"), m["message"][:90]) for m in r.json()["messages"] if m["type"] == "error"]
+        errors += [(name, m.get("lastLine"), m["message"][:90]) for m in r.json()["messages"]
+                   if m["type"] == "error" and not VALIDATOR_LAGS.search(m["message"])]
     check("the W3C validator finds no errors in either page", not errors, errors[:4])
 
 
