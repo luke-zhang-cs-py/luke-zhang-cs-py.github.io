@@ -187,6 +187,10 @@ def check_structure(pg):
           pg.evaluate("[...document.querySelectorAll('time')].every(t => /^\\d{4}-\\d{2}$/.test(t.getAttribute('datetime') || ''))"))
     parts = pg.evaluate("[...document.querySelectorAll('[data-tests]')].map(b => +b.textContent.replace(/,/g, ''))")
     total = pg.evaluate("+document.querySelector('[data-tests-total]').textContent.replace(/,/g, '')")
+    covered = pg.evaluate("+document.querySelector('[data-covered]').textContent.replace(/,/g, '')")
+    pairs = pg.evaluate("PROJECTS.filter(p => p.coverage && p.coverage[0] === 100).map(p => p.coverage[1])")
+    check("the covered-statements figure (%d) is the sum of the 100%%-coverage projects" % covered,
+          pairs and sum(pairs) == covered, "%s = %d" % (pairs, sum(pairs)))
     check("the test total (%d) is the sum of the projects' own counts" % total, len(parts) == DEMOS and sum(parts) == total, "%s = %d" % (parts, sum(parts)))
 
 
@@ -410,7 +414,9 @@ with sync_playwright() as pw:
     # a figure the page derives (a sum of several README numbers) carries data-derived and is skipped
     cards = pg.evaluate("""[...document.querySelectorAll('.project')].map(p => [
         [...p.querySelectorAll('.links a')].pop().href.split('/')[4],
-        [...p.querySelectorAll('.impact b:not([data-derived])')].map(b => b.textContent)])""")
+        [...p.querySelectorAll('.impact b:not([data-derived])')].map(b => b.textContent)
+          .concat((PROJECTS.find(x => x.id === p.id) || {}).coverage
+            ? [(c => c[0] + '% of ' + c[1].toLocaleString('en-US') + ' statements')(PROJECTS.find(x => x.id === p.id).coverage)] : [])])""")
     errors = close_page(pg)
     errors += check_theme(browser)
     errors += check_layout(browser)

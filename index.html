@@ -418,6 +418,7 @@
       demo: PAGES + 'Toronto-Transit-Distance-Matrix/app/',
       more: [{ label: 'Write-up', url: PAGES + 'Toronto-Transit-Distance-Matrix/' }],
       source: REPO + 'Toronto-Transit-Distance-Matrix',
+      coverage: [100, 1055],   // README: "100% of 1,055 statements"
       gif: { src: PAGES + 'Toronto-Transit-Distance-Matrix/demo.gif', w: 760, h: 478,
              alt: 'Dragging the time filter from 5 to 60 minutes: the reach spreads from a single stop to 247 of them, 30 km out' }
     },
@@ -436,6 +437,7 @@
       demo: PAGES + 'Almanac-Main-Full-Stack-Calendar/app/',
       more: [{ label: 'Blank calendar', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/calendar.html' }, { label: 'Write-up', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/' }],
       source: REPO + 'Almanac-Main-Full-Stack-Calendar',
+      coverage: [100, 1971],   // README: "100% of 1,971 statements"
       gif: { src: PAGES + 'Almanac-Main-Full-Stack-Calendar/demo.gif', w: 900, h: 700,
              alt: 'Five set-ups running through the same slot engine: a full week, a block that clips one slot, an afternoon blocked off, a day booked solid, and today with the morning gone' }
     },
@@ -472,6 +474,7 @@
       demo: PAGES + 'Facial-Recognition-Software/camera/',
       more: [{ label: 'Write-up', url: PAGES + 'Facial-Recognition-Software/' }],
       source: REPO + 'Facial-Recognition-Software',
+      coverage: [84, 2338],   // README: "84% of 2,338 statements"
       gif: { src: PAGES + 'Facial-Recognition-Software/demo.gif', w: 900, h: 570,
              alt: 'A face tracked live: the instruction changes from No face detected to Move closer to Head upright to Ready, then a second person appears and the verdict becomes One person only' }
     },
@@ -489,6 +492,7 @@
       demo: PAGES + 'AI-Spam-Message-Classifier/app/',
       more: [{ label: 'Write-up', url: PAGES + 'AI-Spam-Message-Classifier/' }],
       source: REPO + 'AI-Spam-Message-Classifier',
+      coverage: [100, 538],   // README: "100% of 538 statements"
       gif: { src: PAGES + 'AI-Spam-Message-Classifier/demo.gif', w: 720, h: 653,
              alt: 'Classifying three messages: a lunch text comes back HAM, a prize message SPAM, and a competition text SPAM at 79.1%, with the words ranked by how much each pushed the verdict' }
     },
@@ -507,6 +511,7 @@
       demo: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/app/',
       more: [{ label: 'Receipt capture', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/capture/' }, { label: 'Write-up', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/' }],
       source: REPO + 'Budgeting-EU-US-CAN-Almanac-Branch',
+      coverage: [100, 2482],   // README: "100% of 2,482 statements"
       gif: { src: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/demo.gif', w: 860, h: 552,
              alt: "Four purchases landing one at a time, each converted at the rate published on the day it was spent; the Sunday purchase is marked as using Friday's rate, two days back" }
     },
@@ -525,6 +530,7 @@
       demo: PAGES + 'tally/app/',
       more: [{ label: 'Write-up', url: PAGES + 'tally/' }],
       source: REPO + 'tally',
+      coverage: [100, 330],   // README: "100% of 330 statements"
       gif: { src: PAGES + 'tally/demo.gif', w: 470, h: 903,
              alt: "Tapping 3, 5, 0 so the amount shifts in from the right as 3.50, choosing Coffee, saving, then a second entry, the day's total climbing to 15.90 euros" }
     }
@@ -580,12 +586,14 @@
       var b = holder.querySelector('[data-tests]');
       if (b) totalTests += +b.textContent.replace(/,/g, '');
     });
-    var tech = {};
-    PROJECTS.forEach(function (p) { p.tags.forEach(function (t) { tech[t] = true; }); });
+    // Statements under test in the projects at full coverage, each [percent, statements] pair taken
+    // from that project's README (check_site.py holds every pair to its README).
+    var full = PROJECTS.filter(function (p) { return p.coverage && p.coverage[0] === 100; });
+    var covered = full.reduce(function (n, p) { return n + p.coverage[1]; }, 0);
     var allDemo = PROJECTS.every(function (p) { return p.demo; });
     $('stats').innerHTML = [
       [PROJECTS.length, 'open-source projects' + (allDemo ? ' · live demos, no install' : '')],
-      [Object.keys(tech).length, 'technologies across the projects'],
+      [covered.toLocaleString('en-US'), 'Python statements at 100% test coverage, in ' + full.length + ' projects', ' data-covered'],
       [totalTests.toLocaleString('en-US'), 'automated tests and checks', ' data-tests-total'],
       ['MIT', 'licensed, CI on every push']
     ].map(function (s) { return '<div class="card"><b' + (s[2] || '') + '>' + s[0] + '</b><span>' + s[1] + '</span></div>'; }).join('');
