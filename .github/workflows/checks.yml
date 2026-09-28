@@ -13,6 +13,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Browser checks (structure, demos, layout, dark mode, links, privacy)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # the commits check reads the GitHub API
         run: |
           pip install -r requirements.txt
           python -m playwright install --with-deps chromium

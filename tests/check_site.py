@@ -11,7 +11,7 @@ that need the network.
 --coverage writes an HTML report of which lines of the page's JavaScript and which CSS rules
 ran, merged over every scenario above (V8 block coverage and Chrome's CSS rule usage).
 """
-import hashlib, html as htmllib, json, pathlib, re, sys
+import hashlib, html as htmllib, json, os, pathlib, re, sys
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
@@ -21,7 +21,7 @@ SECTIONS = ["about", "projects", "skills", "contact"]
 SKILL_BLOCKS = 8
 WIDTHS = (1280, 820, 390, 360)
 DEMOS = 7
-NETWORK_CHECKS = 3          # the W3C validator, figures against the READMEs, and outbound links
+NETWORK_CHECKS = 4          # the W3C validator, figures against the READMEs, commits against GitHub, and outbound links
 OFFLINE = "--offline" in sys.argv
 SHOTS = sys.argv[sys.argv.index("--shots") + 1] if "--shots" in sys.argv else None
 COVERAGE_OUT = sys.argv[sys.argv.index("--coverage") + 1] if "--coverage" in sys.argv else None
@@ -187,10 +187,6 @@ def check_structure(pg):
           pg.evaluate("[...document.querySelectorAll('time')].every(t => /^\\d{4}-\\d{2}$/.test(t.getAttribute('datetime') || ''))"))
     parts = pg.evaluate("[...document.querySelectorAll('[data-tests]')].map(b => +b.textContent.replace(/,/g, ''))")
     total = pg.evaluate("+document.querySelector('[data-tests-total]').textContent.replace(/,/g, '')")
-    covered = pg.evaluate("+document.querySelector('[data-covered]').textContent.replace(/,/g, '')")
-    pairs = pg.evaluate("PROJECTS.filter(p => p.coverage && p.coverage[0] === 100).map(p => p.coverage[1])")
-    check("the covered-statements figure (%d) is the sum of the 100%%-coverage projects" % covered,
-          pairs and sum(pairs) == covered, "%s = %d" % (pairs, sum(pairs)))
     check("the test total (%d) is the sum of the projects' own counts" % total, len(parts) == DEMOS and sum(parts) == total, "%s = %d" % (parts, sum(parts)))
 
 
@@ -363,6 +359,28 @@ def fetch(api, url):
         return str(e)[:80], ""
 
 
+def commit_count(api, repo):
+    """Commits on the default branch: ask for one per page and read the last page number."""
+    headers = {"Accept": "application/vnd.github+json"}
+    if os.environ.get("GITHUB_TOKEN"):   # CI passes one: unauthenticated calls share 60 an hour per IP
+        headers["Authorization"] = "Bearer " + os.environ["GITHUB_TOKEN"]
+    r = api.get("https://api.github.com/repos/luke-zhang-cs-py/%s/commits?per_page=1" % repo, headers=headers, timeout=20000)
+    if r.status != 200:
+        return None
+    last = re.search(r'[?&]page=(\d+)>; rel="last"', r.headers.get("link", ""))
+    return int(last.group(1)) if last else len(r.json())
+
+
+def check_commits(api, commits):
+    """The commits figure: every project's count is a floor GitHub meets, and the headline is their sum, rounded down."""
+    per_repo, shown = commits
+    actual = {repo: commit_count(api, repo) for repo, _ in per_repo}
+    short = [(repo, claimed, actual[repo]) for repo, claimed in per_repo if not claimed or actual[repo] is None or actual[repo] < claimed]
+    floor = sum(c for _, c in per_repo) // 10 * 10
+    check("the commits figure (%s) is a floor GitHub meets in every repo" % shown,
+          not short and shown == "{:,}+".format(floor), short or {r: a for r, a in actual.items()})
+
+
 def check_figures(api, cards):
     """Every figure in a card's results row must appear in that project's own README."""
     missing = []
@@ -414,9 +432,8 @@ with sync_playwright() as pw:
     # a figure the page derives (a sum of several README numbers) carries data-derived and is skipped
     cards = pg.evaluate("""[...document.querySelectorAll('.project')].map(p => [
         [...p.querySelectorAll('.links a')].pop().href.split('/')[4],
-        [...p.querySelectorAll('.impact b:not([data-derived])')].map(b => b.textContent)
-          .concat((PROJECTS.find(x => x.id === p.id) || {}).coverage
-            ? [(c => c[0] + '% of ' + c[1].toLocaleString('en-US') + ' statements')(PROJECTS.find(x => x.id === p.id).coverage)] : [])])""")
+        [...p.querySelectorAll('.impact b:not([data-derived])')].map(b => b.textContent)])""")
+    commits = pg.evaluate("[PROJECTS.map(p => [p.source.split('/').pop(), p.commits || 0]), document.querySelector('[data-commits]').textContent]")
     errors = close_page(pg)
     errors += check_theme(browser)
     errors += check_layout(browser)
@@ -426,6 +443,7 @@ with sync_playwright() as pw:
         api = pw.request.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0) portfolio-link-check")
         check_valid_html(api)
         check_figures(api, cards)
+        check_commits(api, commits)
         check_links(api, links)
         api.dispose()
     browser.close()
