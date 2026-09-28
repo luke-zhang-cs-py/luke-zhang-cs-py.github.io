@@ -24,7 +24,7 @@
   "@type": "Person",
   "name": "Luke Zhang",
   "url": "https://luke-zhang-cs-py.github.io/",
-  "image": "https://luke-zhang-cs-py.github.io/headshot.jpg",
+  "image": "https://luke-zhang-cs-py.github.io/headshot.jpg?v=2",
   "jobTitle": "Computer Science and Business Administration student",
   "alumniOf": [{"@type": "CollegeOrUniversity", "name": "Northeastern University"}],
   "knowsAbout": ["Python", "Java", "JavaScript", "SQL", "Flask", "REST APIs", "PostgreSQL", "scikit-learn", "OpenCV"],
@@ -367,7 +367,9 @@
   var PROFILE = {
     name: 'Luke Zhang',
     initials: 'LZ',
-    photo: 'headshot.jpg',   // 4:5 portrait, 360 x 450: a native crop (no upscaling), shown up to 240 px wide
+    // 4:5 portrait, 360 x 450, shown up to 240 px wide. Bump ?v= whenever the photo changes:
+    // GitHub Pages lets browsers reuse a cached image for 10 minutes, so the old one would linger.
+    photo: 'headshot.jpg?v=2',
     school: 'Northeastern University',
     program: 'CS and Business Administration',
     status: 'Open to Summer 2027 internships',
