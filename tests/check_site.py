@@ -419,7 +419,7 @@ def check_links(api, links):
 # ---------------------------------------------------------------- run
 check_files()
 with sync_playwright() as pw:
-    browser = pw.chromium.launch()
+    browser = pw.chromium.launch(channel=os.environ.get("PW_CHANNEL") or None)   # PW_CHANNEL=msedge uses an installed Edge
     pg = open_page(browser, viewport={"width": WIDTHS[0], "height": 900}, color_scheme="light")
     check_structure(pg)
     check_components(pg)
