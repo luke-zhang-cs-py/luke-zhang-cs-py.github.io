@@ -602,7 +602,7 @@
     function demo(p) {
       return '<div class="shot"><picture><source media="(prefers-reduced-motion: reduce)" srcset="' + STILL + '">' +
         '<img src="' + esc(p.gif.src) + '" width="' + p.gif.w + '" height="' + p.gif.h + '" loading="lazy" alt="' + esc(p.gif.alt) + '"></picture>' +
-        '<button class="play" type="button" style="--ratio:' + p.gif.w + '/' + p.gif.h + '" hidden>▶ Play demo</button></div>';
+        '<button class="play" type="button" style="--ratio:' + p.gif.w + '/' + p.gif.h + '" aria-label="Play demo: ' + esc(p.title) + '" hidden>▶ Play demo</button></div>';
     }
     function card(p) {
       var list = function (items, cls, label) { return '<ul class="' + cls + '" aria-label="' + label + '">' + items + '</ul>'; };

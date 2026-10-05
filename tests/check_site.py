@@ -11,7 +11,7 @@ that need the network.
 --coverage writes an HTML report of which lines of the page's JavaScript and which CSS rules
 ran, merged over every scenario above (V8 block coverage and Chrome's CSS rule usage).
 """
-import hashlib, html as htmllib, json, os, pathlib, re, sys
+import html as htmllib, json, os, pathlib, re, sys
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
@@ -26,9 +26,9 @@ OFFLINE = "--offline" in sys.argv
 SHOTS = sys.argv[sys.argv.index("--shots") + 1] if "--shots" in sys.argv else None
 COVERAGE_OUT = sys.argv[sys.argv.index("--coverage") + 1] if "--coverage" in sys.argv else None
 
-# The resume's phone number, kept here only as a hash so this public repo can't leak it either:
-# every phone-shaped string in the site is normalised to ten digits, hashed and compared.
-PHONE_SHA256 = "acf09c88d166a1bee808a66010d3e9662137f95c1a42f36bad835d2d66c7f426"
+# The site publishes no phone number, so any phone-shaped string is a leak. This used to compare
+# against an unsalted SHA-256 of the resume's number, but a ten-digit number has only 10^10
+# candidates, so that hash could be brute-forced back to the number in seconds.
 PHONE_SHAPE = re.compile(r"(?:\+?1[\s.\-]*)?\(?\d{3}\)?[\s.\-]*\d{3}[\s.\-]*\d{4}")
 
 results = []   # (name, ok)
@@ -40,8 +40,7 @@ def check(name, ok, detail=""):
 
 
 def leaks_phone(text):
-    return any(hashlib.sha256(re.sub(r"\D", "", m.group())[-10:].encode()).hexdigest() == PHONE_SHA256
-               for m in PHONE_SHAPE.finditer(text))
+    return [m.group() for m in PHONE_SHAPE.finditer(text)]
 
 
 def site_text():
@@ -164,7 +163,12 @@ def close_page(pg):
 
 # ---------------------------------------------------------------- the checks
 def check_files():
-    check("privacy: the resume's phone number is nowhere in the site", not leaks_phone(site_text()))
+    # 555-0100..0199 is reserved for fiction: the control proves the pattern can match at all,
+    # and is split so this file does not match itself. Only a count is printed, because CI logs
+    # on a public repo are public too.
+    found = leaks_phone(site_text())
+    check("privacy: the resume's phone number is nowhere in the site",
+          not found and leaks_phone("call (555) 555-" + "0123"), "%d phone-shaped strings" % len(found))
     check("the favicon, link-preview image and 404 page exist", all((ROOT / f).is_file() for f in ("favicon.svg", "og.png", "404.html")))
     size = Image.open(ROOT / "og.png").size
     check("the link-preview image is 1200 x 630, as its tags say", size == (1200, 630), size)
@@ -228,7 +232,7 @@ def check_components(pg):
 
 def contrast_failures(pg):
     """WCAG AA: every piece of visible text against the colour actually behind it."""
-    return pg.evaluate("""() => {
+    return pg.evaluate(r"""() => {
       // rgb()/rgba() give 0-255 channels; color(srgb ...), which Chrome uses for color-mix(), gives 0-1
       const parse = c => { const n = c.match(/[\d.]+/g).map(Number); const unit = c.startsWith('color(') ? 1 : 255;
                            return { rgb: n.slice(0, 3).map(v => v / unit), a: n.length > 3 ? n[3] : 1 }; };
@@ -344,7 +348,10 @@ def check_motion(browser):
     rm.wait_for_timeout(300)
     loaded = rm.evaluate("[...document.querySelectorAll('.shot img')].filter(i => i.currentSrc.endsWith('.gif')).length")
     buttons = rm.locator(".play:visible").count()
-    check("reduced motion: no GIF plays by itself, each has a Play button", loaded == 0 and buttons == DEMOS, "%d loaded, %d buttons" % (loaded, buttons))
+    # Seven buttons all named "Play demo" are indistinguishable in a screen reader's list of buttons.
+    names = set(rm.evaluate("[...document.querySelectorAll('.play')].map(b => b.getAttribute('aria-label') || '')"))
+    check("reduced motion: no GIF plays by itself, each has a Play button", loaded == 0 and buttons == DEMOS and len(names) == DEMOS and "" not in names,
+          "%d loaded, %d buttons, %d distinct names" % (loaded, buttons, len(names)))
     rm.locator(".play").first.click(); rm.wait_for_timeout(800)
     check("reduced motion: Play shows that demo",
           rm.evaluate("document.querySelector('.shot img').currentSrc.endsWith('.gif') && !document.querySelector('.shot img').hidden"))
