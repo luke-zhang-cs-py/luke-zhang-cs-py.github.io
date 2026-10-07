@@ -165,10 +165,11 @@
   .project:hover{box-shadow:var(--shadow-lift);transform:translateY(-2px)}
   .project.featured{display:grid;grid-template-columns:minmax(0,1fr)}
   @container projects (min-width:48rem){
-    .project.featured{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
+    .project.featured{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   }
   .shot{background:var(--surface-2);padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:14px;justify-content:center}
-  .project.featured .shot{justify-content:flex-start}
+  .project.featured .shot{justify-content:center;padding:12px}
+  .case{margin:12px 0 0}
   /* every grid card's demo gets the same frame, so the text below starts level across a row */
   .grid .project:not(.featured) .shot{aspect-ratio:16/10;position:relative;padding:0}
   .grid .project:not(.featured) .shot picture,.grid .project:not(.featured) .play{position:absolute;inset:12px;width:auto;height:auto}
@@ -178,11 +179,11 @@
   .play{display:none;width:100%;aspect-ratio:var(--ratio);border:1px dashed var(--line);border-radius:var(--r-s);background:var(--surface);color:var(--text);font:600 .95rem var(--sans);cursor:pointer}
   .reduced .play:not([hidden]){display:block}
   .body{padding:var(--pad-body);display:flex;flex-direction:column;flex:1}
-  .grid .project:not(.featured) .body{padding:var(--pad-card)}
+  .grid .project .body{padding:var(--pad-card)}
   .meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 6px;font-family:var(--mono);font-size:.8rem;color:var(--faint)}
   .meta .kind{color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
   .project h3{font-size:clamp(1.2rem,1.05rem + .7vw,1.55rem);letter-spacing:-.02em;margin:0 0 10px;line-height:1.2}
-  .grid .project:not(.featured) h3{font-size:1.15rem}
+  .grid .project h3{font-size:1.15rem}
   .project .pitch{margin:0 0 16px;color:var(--muted)}
   .case{display:grid;gap:12px;margin:0 0 18px}
   .case div{border-left:2px solid var(--accent);padding:2px 0 2px 14px}
@@ -200,7 +201,7 @@
   .tags li{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
   .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
   .links .btn{padding:.6em 1em;font-size:.9rem}
-  .grid .project:not(.featured) .links .btn{padding:.5em .85em;font-size:.86rem}
+  .grid .project .links .btn{padding:.5em .85em;font-size:.86rem}
 
   /* skills: eight blocks, always in whole rows -- four across, two, or one -- chosen by the room the grid has */
   #skills{container:skills / inline-size}
@@ -631,8 +632,8 @@
       var body = '<p class="meta"><span class="kind">' + esc(p.kind) + '</span><time datetime="' + p.since + '">' + esc(p.dates) + '</time></p>' +
         '<h3 id="h-' + p.id + '">' + esc(p.title) + '</h3><p class="pitch">' + esc(p.summary) + '</p>';
       if (p.featured) {
-        body += '<dl class="case">' + [['Problem', p.problem], ['Approach', p.approach], ['Result', p.result]].map(function (c) {
-          return '<div><dt>' + c[0] + '</dt><dd>' + esc(c[1]) + '</dd></div>'; }).join('') + '</dl>';
+        body += '<details class="inside"><summary>Problem, approach, result</summary><dl class="case">' + [['Problem', p.problem], ['Approach', p.approach], ['Result', p.result]].map(function (c) {
+          return '<div><dt>' + c[0] + '</dt><dd>' + esc(c[1]) + '</dd></div>'; }).join('') + '</dl></details>';
       }
       body += '<details class="inside"><summary>What\'s inside</summary><ul>' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></details>' +
         list(p.impact.map(function (i) { return '<li>' + i.html + '</li>'; }).join(''), 'impact', 'Results') +

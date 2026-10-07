@@ -44,7 +44,7 @@ filter chips from the projects' categories, and the headline test total is added
 
 ```bash
 pip install -r requirements.txt && python -m playwright install chromium
-python tests/check_site.py        # 50 checks in a real browser (--offline skips the 3 that need the network)
+python tests/check_site.py        # 51 checks in a real browser (--offline skips the 3 that need the network)
 python tests/check_site.py --coverage coverage.html   # plus which lines of JS and CSS rules ran
 python tools/record_demo.py       # re-record docs/demo.gif from the live site
 python tools/make_og.py           # re-render og.png, the link-preview image

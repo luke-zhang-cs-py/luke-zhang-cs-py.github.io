@@ -343,10 +343,11 @@ def check_layout(browser):
       const cells = cards.reduce((n, c) => n + (c.classList.contains('featured') ? 2 : 1), 0);
       const rows = new Set(cards.map(c => Math.round(c.getBoundingClientRect().top))).size;
       const f = document.querySelector('.project.featured').getBoundingClientRect(), o = cards[1].getBoundingClientRect();
-      return {cols, cells, rows, wide: Math.round(f.width / o.width * 10) / 10, first: cards[0].id};
+      return {cols, cells, rows, wide: Math.round(f.width / o.width * 10) / 10, first: cards[0].id, tall: Math.round(f.height / o.height * 100) / 100};
     }""")
     check("at 1280 px the projects are a 3 by 3 grid, the transit card taking two cells",
           grid["cols"] == 3 and grid["cells"] == 9 and grid["rows"] == 3 and grid["wide"] >= 2 and grid["first"] == "transit", grid)
+    check("the transit card is no taller than the card beside it", grid["tall"] <= 1.02, grid)
     if SHOTS:
         p.locator("#projectList").screenshot(path=SHOTS + "/pf-grid.png")
     p.emulate_media(media="print"); p.wait_for_timeout(200)
