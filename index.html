@@ -422,7 +422,7 @@
       demo: PAGES + 'Toronto-Transit-Distance-Matrix/app/',
       more: [{ label: 'Write-up', url: PAGES + 'Toronto-Transit-Distance-Matrix/' }],
       source: REPO + 'Toronto-Transit-Distance-Matrix',
-      commits: 40,
+      commits: 44,
       gif: { src: PAGES + 'Toronto-Transit-Distance-Matrix/demo.gif', w: 760, h: 478,
              alt: 'Dragging the time filter from 5 to 60 minutes: the reach spreads from a single stop to 247 of them, 30 km out' }
     },
@@ -441,7 +441,7 @@
       demo: PAGES + 'Almanac-Main-Full-Stack-Calendar/app/',
       more: [{ label: 'Blank calendar', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/calendar.html' }, { label: 'Write-up', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/' }],
       source: REPO + 'Almanac-Main-Full-Stack-Calendar',
-      commits: 46,
+      commits: 48,
       gif: { src: PAGES + 'Almanac-Main-Full-Stack-Calendar/demo.gif', w: 900, h: 700,
              alt: 'Five set-ups running through the same slot engine: a full week, a block that clips one slot, an afternoon blocked off, a day booked solid, and today with the morning gone' }
     },
@@ -456,12 +456,12 @@
         "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines."
       ],
       impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+41</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
-               { html: '<b data-tests data-derived title="68 regression, 39 rules, 37 titled-player, 56 browser and 40 perft checks">240</b> checks' }],
+               { html: '<b data-tests data-derived title="75 regression, 39 rules, 37 titled-player, 12 coach, 56 browser and 40 perft checks">259</b> checks' }],
       tags: ['JavaScript', 'Web Workers', 'Stockfish', 'UCI', 'Lichess API', 'Playwright'],
       demo: PAGES + 'Dvoerstky-AI-Chess-Coach/',
       more: [{ label: 'Guide', url: REPO + 'Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md' }],
       source: REPO + 'Dvoerstky-AI-Chess-Coach',
-      commits: 20,
+      commits: 23,
       gif: { src: PAGES + 'Dvoerstky-AI-Chess-Coach/docs/demo.gif', w: 960, h: 795,
              alt: 'The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder' }
     },
@@ -476,12 +476,12 @@
         'A browser terminal lists all 3,300 NYSE tickers the SEC publishes, draws the bull, base and bear cases of a memo as a price projection: 2,000 simulated paths with 10-90% bands, the stop-working price and the rating they imply, and ranks trade ideas by expected return, reward to risk or chance of hitting the stop.',
         'Benchmarked against seven prediction algorithms with permutation tests, a false-discovery correction, a holdout and trading costs.'
       ],
-      impact: [{ html: '<b data-tests>110</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }],
+      impact: [{ html: '<b data-tests>112</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'JavaScript', 'pytest'],
       demo: PAGES + 'ipo-bot/app/',
       more: [{ label: 'Write-up', url: PAGES + 'ipo-bot/' }],
       source: REPO + 'ipo-bot',
-      commits: 10,
+      commits: 18,
       gif: { src: PAGES + 'ipo-bot/demo.gif', w: 960, h: 600,
              alt: 'A price projection with bull, base and bear paths and 10-90% bands, then sizing a purchase as the stop-working price moves, then the memo checker catching a rating the numbers do not support' }
     },
@@ -499,7 +499,7 @@
       demo: PAGES + 'Facial-Recognition-Software/camera/',
       more: [{ label: 'Write-up', url: PAGES + 'Facial-Recognition-Software/' }],
       source: REPO + 'Facial-Recognition-Software',
-      commits: 60,
+      commits: 62,
       gif: { src: PAGES + 'Facial-Recognition-Software/demo.gif', w: 900, h: 570,
              alt: 'A face tracked live: the instruction changes from No face detected to Move closer to Head upright to Ready, then a second person appears and the verdict becomes One person only' }
     },
@@ -517,7 +517,7 @@
       demo: PAGES + 'AI-Spam-Message-Classifier/app/',
       more: [{ label: 'Write-up', url: PAGES + 'AI-Spam-Message-Classifier/' }],
       source: REPO + 'AI-Spam-Message-Classifier',
-      commits: 20,
+      commits: 22,
       gif: { src: PAGES + 'AI-Spam-Message-Classifier/demo.gif', w: 720, h: 653,
              alt: 'Classifying three messages: a lunch text comes back HAM, a prize message SPAM, and a competition text SPAM at 79.1%, with the words ranked by how much each pushed the verdict' }
     },
@@ -536,7 +536,7 @@
       demo: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/app/',
       more: [{ label: 'Receipt capture', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/capture/' }, { label: 'Write-up', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/' }],
       source: REPO + 'Budgeting-EU-US-CAN-Almanac-Branch',
-      commits: 30,
+      commits: 32,
       gif: { src: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/demo.gif', w: 860, h: 552,
              alt: "Four purchases landing one at a time, each converted at the rate published on the day it was spent; the Sunday purchase is marked as using Friday's rate, two days back" }
     },
@@ -555,7 +555,7 @@
       demo: PAGES + 'tally/app/',
       more: [{ label: 'Write-up', url: PAGES + 'tally/' }],
       source: REPO + 'tally',
-      commits: 14,
+      commits: 16,
       gif: { src: PAGES + 'tally/demo.gif', w: 470, h: 903,
              alt: "Tapping 3, 5, 0 so the amount shifts in from the right as 3.50, choosing Coffee, saving, then a second entry, the day's total climbing to 15.90 euros" }
     }
