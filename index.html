@@ -471,16 +471,17 @@
         'A tool-using agent over SEC EDGAR, XBRL financials, FRED and market data, with every calculation done in a calculator tool.',
         'Eleven accuracy checks before each answer, and a KEY NUMBERS block that verify.py recomputes: market cap, EV, multiples and scenario maths.',
         'Portfolio mode sizes a buy by the smallest of four limits from your own rules; the browser demo is the same code, tested against the Python.',
+        'A browser terminal draws the bull, base and bear cases of a memo as a price projection: 2,000 simulated paths with 10-90% bands, the stop-working price and the rating they imply.',
         'Benchmarked against seven prediction algorithms with permutation tests, a false-discovery correction, a holdout and trading costs.'
       ],
-      impact: [{ html: '<b data-tests>100</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }],
+      impact: [{ html: '<b data-tests>104</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'JavaScript', 'pytest'],
       demo: PAGES + 'ipo-bot/app/',
       more: [{ label: 'Write-up', url: PAGES + 'ipo-bot/' }],
       source: REPO + 'ipo-bot',
       commits: 10,
       gif: { src: PAGES + 'ipo-bot/demo.gif', w: 960, h: 600,
-             alt: 'Sizing a purchase by portfolio rules as the stop-working price moves, then the memo checker catching an EV that does not add up and a rating the numbers do not support' }
+             alt: 'A price projection with bull, base and bear paths and 10-90% bands, then sizing a purchase as the stop-working price moves, then the memo checker catching a rating the numbers do not support' }
     },
     {
       id: 'faces', title: 'Face Recognition Attendance', kind: 'Computer vision · fairness', since: '2026-08', dates: 'Aug 2026 – Present',
