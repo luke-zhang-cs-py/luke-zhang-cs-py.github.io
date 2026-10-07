@@ -163,12 +163,16 @@
   .project{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);overflow:hidden;box-shadow:var(--shadow)}
   .project[hidden]{display:none}
   .project:hover{box-shadow:var(--shadow-lift);transform:translateY(-2px)}
-  .project.featured{display:grid;grid-template-columns:minmax(0,1fr)}
+  .project.featured .half{display:flex;flex-direction:column;min-width:0}
+  .project.featured .half:last-child{flex:1}
   @container projects (min-width:48rem){
-    .project.featured{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+    .project.featured .shot{position:relative;padding:0;flex:1 0 auto;min-height:38cqw}   /* grows to the row's height, so the card never shows empty space */
+    .project.featured .body{flex:0 0 auto}
+    .project.featured .shot picture,.project.featured .play{position:absolute;inset:12px;width:auto;height:auto}
+    .project.featured .shot img{height:100%;object-fit:cover;object-position:center 45%}
+    .project.featured .body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 var(--gap-m)}
   }
   .shot{background:var(--surface-2);padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:14px;justify-content:center}
-  .project.featured .shot{justify-content:center;padding:12px}
   .case{margin:12px 0 0}
   /* every grid card's demo gets the same frame, so the text below starts level across a row */
   .grid .project:not(.featured) .shot{aspect-ratio:16/10;position:relative;padding:0}
@@ -635,12 +639,13 @@
         body += '<details class="inside"><summary>Problem, approach, result</summary><dl class="case">' + [['Problem', p.problem], ['Approach', p.approach], ['Result', p.result]].map(function (c) {
           return '<div><dt>' + c[0] + '</dt><dd>' + esc(c[1]) + '</dd></div>'; }).join('') + '</dl></details>';
       }
-      body += '<details class="inside"><summary>What\'s inside</summary><ul>' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></details>' +
-        list(p.impact.map(function (i) { return '<li>' + i.html + '</li>'; }).join(''), 'impact', 'Results') +
+      body += '<details class="inside"><summary>What\'s inside</summary><ul>' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></details>';
+      if (p.featured) body = '<div class="half">' + body + '</div><div class="half">';
+      body += list(p.impact.map(function (i) { return '<li>' + i.html + '</li>'; }).join(''), 'impact', 'Results') +
         list(p.tags.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join(''), 'tags', 'Technologies') +
         '<div class="links"><a class="btn primary" href="' + esc(p.demo) + '">Live demo</a>' +
         p.more.map(function (m) { return '<a class="btn" href="' + esc(m.url) + '">' + esc(m.label) + '</a>'; }).join('') +
-        '<a class="btn" href="' + esc(p.source) + '">Source</a></div>';
+        '<a class="btn" href="' + esc(p.source) + '">Source</a></div>' + (p.featured ? '</div>' : '');
       return '<article class="reveal project' + (p.featured ? ' featured' : '') + '" id="' + p.id + '" aria-labelledby="h-' + p.id + '" data-categories="' +
         esc(p.categories.join('|')) + '">' + demo(p) + '<div class="body">' + body + '</div></article>';
     }
