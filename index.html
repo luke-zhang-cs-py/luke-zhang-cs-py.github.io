@@ -471,10 +471,10 @@
         'A tool-using agent over SEC EDGAR, XBRL financials, FRED and market data, with every calculation done in a calculator tool.',
         'Eleven accuracy checks before each answer, and a KEY NUMBERS block that verify.py recomputes: market cap, EV, multiples and scenario maths.',
         'Portfolio mode sizes a buy by the smallest of four limits from your own rules; the browser demo is the same code, tested against the Python.',
-        'A browser terminal draws the bull, base and bear cases of a memo as a price projection: 2,000 simulated paths with 10-90% bands, the stop-working price and the rating they imply.',
+        'A browser terminal draws the bull, base and bear cases of a memo as a price projection: 2,000 simulated paths with 10-90% bands, the stop-working price and the rating they imply, and ranks trade ideas by expected return, reward to risk or chance of hitting the stop.',
         'Benchmarked against seven prediction algorithms with permutation tests, a false-discovery correction, a holdout and trading costs.'
       ],
-      impact: [{ html: '<b data-tests>104</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }],
+      impact: [{ html: '<b data-tests>106</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'JavaScript', 'pytest'],
       demo: PAGES + 'ipo-bot/app/',
       more: [{ label: 'Write-up', url: PAGES + 'ipo-bot/' }],
