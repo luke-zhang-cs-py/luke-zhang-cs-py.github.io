@@ -5,8 +5,8 @@
 [![No build step](https://img.shields.io/badge/HTML%20%2B%20CSS-no%20build%20step-blue.svg)](index.html)
 
 Eight projects in one place, each with a live demo that runs in your browser, what it does, what was measured,
-and links to its write-up and source. One is told as a case study (problem, approach, result); the rest sit in a
-grid you can filter by category. Press <kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd> on the site to jump anywhere.
+and links to its write-up and source, in one grid you can filter by category; the featured project takes two
+cells, with its case study (problem, approach, result) a click away. Press <kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd> on the site to jump anywhere.
 
 ### ▶ [Open the portfolio →](https://luke-zhang-cs-py.github.io/)
 
@@ -44,7 +44,7 @@ filter chips from the projects' categories, and the headline test total is added
 
 ```bash
 pip install -r requirements.txt && python -m playwright install chromium
-python tests/check_site.py        # 51 checks in a real browser (--offline skips the 3 that need the network)
+python tests/check_site.py        # 52 checks in a real browser (--offline skips the 4 that need the network)
 python tests/check_site.py --coverage coverage.html   # plus which lines of JS and CSS rules ran
 python tools/record_demo.py       # re-record docs/demo.gif from the live site
 python tools/make_og.py           # re-render og.png, the link-preview image

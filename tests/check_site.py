@@ -180,7 +180,7 @@ def check_structure(pg):
     check("no Experience or Education section", pg.locator("#experience, .job, #education, .school").count() == 0)
     check("eight skill blocks, each with a heading and at least four skills",
           pg.locator(".skill").count() == SKILL_BLOCKS and pg.evaluate("[...document.querySelectorAll('.skill')].every(s => s.querySelector('h3') && s.querySelectorAll('li').length >= 4)"))
-    check("eight projects, each with a live demo, a write-up or guide, and its source",
+    check("%d projects, each with a live demo, a write-up or guide, and its source" % DEMOS,
           pg.locator(".project").count() == DEMOS and pg.evaluate("""[...document.querySelectorAll('.project')].every(p => {
               const hrefs = [...p.querySelectorAll('.links a')].map(a => a.href);
               return p.querySelector('.links .btn.primary') && hrefs.some(h => /github\\.com\\/luke-zhang-cs-py\\/[^/]+$/.test(h)) && hrefs.length >= 3; })"""))
@@ -257,7 +257,11 @@ def contrast_failures(pg):
 def check_demos(pg):
     for y in range(0, pg.evaluate("document.body.scrollHeight"), 500):
         scroll_to(pg, y)
-    pg.wait_for_function("[...document.querySelectorAll('.shot img')].every(i => i.complete && i.naturalWidth)", timeout=60000)
+    # Polled from here, not with wait_for_function: its string predicate is eval'd in the page, which the CSP refuses.
+    for _ in range(240):
+        if pg.evaluate("[...document.querySelectorAll('.shot img')].every(i => i.complete && i.naturalWidth)"):
+            break
+        pg.wait_for_timeout(250)
     imgs = pg.evaluate("[...document.querySelectorAll('.shot img')].map(i => ({src: i.src, w: i.naturalWidth, attr: +i.getAttribute('width')}))")
     check("every demo GIF loads (%d)" % len(imgs), len(imgs) == DEMOS and all(i["w"] for i in imgs))
     check("each GIF's width attribute matches the file, so nothing jumps as it loads", all(i["w"] == i["attr"] for i in imgs),
@@ -345,8 +349,8 @@ def check_layout(browser):
       const f = document.querySelector('.project.featured').getBoundingClientRect(), o = cards[1].getBoundingClientRect();
       return {cols, cells, rows, wide: Math.round(f.width / o.width * 10) / 10, first: cards[0].id, tall: Math.round(f.height / o.height * 100) / 100};
     }""")
-    check("at 1280 px the projects are a 3 by 3 grid, the transit card taking two cells",
-          grid["cols"] == 3 and grid["cells"] == 9 and grid["rows"] == 3 and grid["wide"] >= 2 and grid["first"] == "transit", grid)
+    check("at 1280 px the projects fill whole rows of three, the transit card taking two cells",
+          grid["cols"] == 3 and grid["cells"] % 3 == 0 and grid["rows"] == grid["cells"] // 3 and grid["wide"] >= 2 and grid["first"] == "transit", grid)
     check("the transit card is no taller than the card beside it", grid["tall"] <= 1.02, grid)
     if SHOTS:
         p.locator("#projectList").screenshot(path=SHOTS + "/pf-grid.png")
@@ -361,10 +365,15 @@ def check_motion(browser):
     rm.wait_for_timeout(300)
     loaded = rm.evaluate("[...document.querySelectorAll('.shot img')].filter(i => i.currentSrc.endsWith('.gif')).length")
     buttons = rm.locator(".play:visible").count()
-    # Eight buttons all named "Play demo" are indistinguishable in a screen reader's list of buttons.
+    # Buttons all named "Play demo" are indistinguishable in a screen reader's list of buttons.
     names = set(rm.evaluate("[...document.querySelectorAll('.play')].map(b => b.getAttribute('aria-label') || '')"))
     check("reduced motion: no GIF plays by itself, each has a Play button", loaded == 0 and buttons == DEMOS and len(names) == DEMOS and "" not in names,
           "%d loaded, %d buttons, %d distinct names" % (loaded, buttons, len(names)))
+    # A hidden still takes no room: the featured card's demo at two columns is not a tall empty box.
+    rm.set_viewport_size({"width": 760, "height": 900}); rm.wait_for_timeout(300)
+    ghost = rm.evaluate("[...document.querySelectorAll('.shot img[hidden]')].filter(i => i.getBoundingClientRect().height > 0).length")
+    check("reduced motion: a hidden demo takes no room at any width", ghost == 0, "%d hidden images still laid out" % ghost)
+    rm.set_viewport_size({"width": 1280, "height": 900}); rm.wait_for_timeout(300)
     rm.locator(".play").first.click(); rm.wait_for_timeout(800)
     check("reduced motion: Play shows that demo",
           rm.evaluate("document.querySelector('.shot img').currentSrc.endsWith('.gif') && !document.querySelector('.shot img').hidden"))
