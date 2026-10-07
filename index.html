@@ -150,37 +150,39 @@
     .focus{grid-template-columns:minmax(0,1fr)}
   }
 
-  /* projects: a featured case study, then a grid; each card lays itself out by the room it has */
+  /* projects: one grid of nine cells -- three across on a wide screen, the featured case study taking two -- then two across, then one */
   .filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 var(--gap-m)}
   .chip{font:600 .82rem var(--mono);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
   .chip:hover{border-color:var(--accent);color:var(--text)}
   .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
   .count{font-family:var(--mono);font-size:.82rem;color:var(--faint);margin:0 0 var(--gap-m)}
   .projects{display:grid;gap:var(--gap-l);container:projects / inline-size}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,19rem),1fr));gap:var(--gap-m)}
+  .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--gap-m)}
+  @container projects (min-width:40rem){ .grid{grid-template-columns:repeat(2,minmax(0,1fr))} .project.featured{grid-column:span 2} }
+  @container projects (min-width:60rem){ .grid{grid-template-columns:repeat(3,minmax(0,1fr))} }
   .project{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);overflow:hidden;box-shadow:var(--shadow)}
   .project[hidden]{display:none}
   .project:hover{box-shadow:var(--shadow-lift);transform:translateY(-2px)}
   .project.featured{display:grid;grid-template-columns:minmax(0,1fr)}
-  @container projects (min-width:900px){
-    .project.featured{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+  @container projects (min-width:48rem){
+    .project.featured{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}
   }
   .shot{background:var(--surface-2);padding:clamp(12px,2vw,18px);display:flex;flex-direction:column;gap:14px;justify-content:center}
   .project.featured .shot{justify-content:flex-start}
   /* every grid card's demo gets the same frame, so the text below starts level across a row */
-  .grid .shot{aspect-ratio:16/10;position:relative;padding:0}
-  .grid .shot picture,.grid .play{position:absolute;inset:12px;width:auto;height:auto}
+  .grid .project:not(.featured) .shot{aspect-ratio:16/10;position:relative;padding:0}
+  .grid .project:not(.featured) .shot picture,.grid .project:not(.featured) .play{position:absolute;inset:12px;width:auto;height:auto}
   .shot picture{display:block}
   .shot img{display:block;width:100%;height:auto;border-radius:var(--r-s);border:1px solid var(--line);background:var(--surface)}
-  .grid .shot img{height:100%;object-fit:contain;object-position:top center;border:0;background:none}
+  .grid .project:not(.featured) .shot img{height:100%;object-fit:contain;object-position:top center;border:0;background:none}
   .play{display:none;width:100%;aspect-ratio:var(--ratio);border:1px dashed var(--line);border-radius:var(--r-s);background:var(--surface);color:var(--text);font:600 .95rem var(--sans);cursor:pointer}
   .reduced .play:not([hidden]){display:block}
   .body{padding:var(--pad-body);display:flex;flex-direction:column;flex:1}
-  .grid .body{padding:var(--pad-card)}
+  .grid .project:not(.featured) .body{padding:var(--pad-card)}
   .meta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 6px;font-family:var(--mono);font-size:.8rem;color:var(--faint)}
   .meta .kind{color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
   .project h3{font-size:clamp(1.2rem,1.05rem + .7vw,1.55rem);letter-spacing:-.02em;margin:0 0 10px;line-height:1.2}
-  .grid .project h3{font-size:1.15rem}
+  .grid .project:not(.featured) h3{font-size:1.15rem}
   .project .pitch{margin:0 0 16px;color:var(--muted)}
   .case{display:grid;gap:12px;margin:0 0 18px}
   .case div{border-left:2px solid var(--accent);padding:2px 0 2px 14px}
@@ -198,7 +200,7 @@
   .tags li{font-family:var(--mono);font-size:.76rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
   .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:auto}
   .links .btn{padding:.6em 1em;font-size:.9rem}
-  .grid .links .btn{padding:.5em .85em;font-size:.86rem}
+  .grid .project:not(.featured) .links .btn{padding:.5em .85em;font-size:.86rem}
 
   /* skills: eight blocks, always in whole rows -- four across, two, or one -- chosen by the room the grid has */
   #skills{container:skills / inline-size}
@@ -640,8 +642,9 @@
       return '<article class="reveal project' + (p.featured ? ' featured' : '') + '" id="' + p.id + '" aria-labelledby="h-' + p.id + '" data-categories="' +
         esc(p.categories.join('|')) + '">' + demo(p) + '<div class="body">' + body + '</div></article>';
     }
-    $('projectList').innerHTML = PROJECTS.filter(function (p) { return p.featured; }).map(card).join('') +
-      '<div class="grid">' + PROJECTS.filter(function (p) { return !p.featured; }).map(card).join('') + '</div>';
+    // the featured card leads, so its two cells always start a row and the eight cards fill the nine cells exactly
+    $('projectList').innerHTML = '<div class="grid">' + PROJECTS.filter(function (p) { return p.featured; }).concat(
+      PROJECTS.filter(function (p) { return !p.featured; })).map(card).join('') + '</div>';
 
     // ---- the category filter
     var categories = [];

@@ -337,6 +337,18 @@ def check_layout(browser):
             m.screenshot(path=SHOTS + "/pf-390.png")
         errors += close_page(m)
     p = open_page(browser, viewport={"width": 1280, "height": 900})
+    grid = p.evaluate("""() => {
+      const g = document.querySelector('#projectList .grid'), cards = [...g.children];
+      const cols = getComputedStyle(g).gridTemplateColumns.split(' ').length;
+      const cells = cards.reduce((n, c) => n + (c.classList.contains('featured') ? 2 : 1), 0);
+      const rows = new Set(cards.map(c => Math.round(c.getBoundingClientRect().top))).size;
+      const f = document.querySelector('.project.featured').getBoundingClientRect(), o = cards[1].getBoundingClientRect();
+      return {cols, cells, rows, wide: Math.round(f.width / o.width * 10) / 10, first: cards[0].id};
+    }""")
+    check("at 1280 px the projects are a 3 by 3 grid, the transit card taking two cells",
+          grid["cols"] == 3 and grid["cells"] == 9 and grid["rows"] == 3 and grid["wide"] >= 2 and grid["first"] == "transit", grid)
+    if SHOTS:
+        p.locator("#projectList").screenshot(path=SHOTS + "/pf-grid.png")
     p.emulate_media(media="print"); p.wait_for_timeout(200)
     check("print leaves out the header, demos and buttons",
           p.evaluate("['.bar', '.shot', '.links'].every(s => getComputedStyle(document.querySelector(s)).display === 'none')"))
