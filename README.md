@@ -10,7 +10,7 @@ grid you can filter by category. Press <kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</k
 
 ### ▶ [Open the portfolio →](https://luke-zhang-cs-py.github.io/)
 
-![Scrolling the portfolio in dark mode: the introduction, then Toronto Transit, Almanac, the chess coach, face recognition, the spam classifier and Tally, each with its own demo playing, then the skills and contact sections](docs/demo.gif)
+![Scrolling the portfolio in dark mode: the introduction, then Toronto Transit, Almanac, the chess coach, the IPO bot, face recognition, the spam classifier, Wallet FX and Tally, each with its own demo playing, then the skills and contact sections](docs/demo.gif)
 
 *Above: the live site in dark mode, top to bottom. Each project's own demo plays inside its card as
 the cards ease in. Recorded from the published page by [`tools/record_demo.py`](tools/record_demo.py).*
