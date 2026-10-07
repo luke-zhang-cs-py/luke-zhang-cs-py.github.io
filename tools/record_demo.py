@@ -58,7 +58,7 @@ with sync_playwright() as pw:
     b.close()
 
 OUT.parent.mkdir(exist_ok=True)
-# each frame its own palette: light mode, dark mode and seven different demo GIFs share none
+# each frame its own palette: light mode, dark mode and eight different demo GIFs share none
 pal = [f.quantize(colors=128, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE) for f, _ in frames]
 pal[0].save(OUT, save_all=True, append_images=pal[1:], duration=[ms for _, ms in frames], loop=0, optimize=True)
 print(f"wrote {OUT} ({OUT.stat().st_size // 1024} KB, {len(frames)} frames, {sum(ms for _, ms in frames) / 1000:.1f} s)")

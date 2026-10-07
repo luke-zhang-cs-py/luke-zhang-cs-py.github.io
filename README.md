@@ -4,7 +4,7 @@
 [![Live site](https://img.shields.io/badge/live-luke--zhang--cs--py.github.io-0F766E.svg)](https://luke-zhang-cs-py.github.io/)
 [![No build step](https://img.shields.io/badge/HTML%20%2B%20CSS-no%20build%20step-blue.svg)](index.html)
 
-Seven projects in one place, each with a live demo that runs in your browser, what it does, what was measured,
+Eight projects in one place, each with a live demo that runs in your browser, what it does, what was measured,
 and links to its write-up and source. One is told as a case study (problem, approach, result); the rest sit in a
 grid you can filter by category. Press <kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd> on the site to jump anywhere.
 
@@ -24,6 +24,7 @@ If `github.io` is blocked on your network (some university wifi is), open [`inde
 | **Toronto Transit Reach** | Isochrone map and trip planner over the TTC's timetable and live feed | [live](https://luke-zhang-cs-py.github.io/Toronto-Transit-Distance-Matrix/app/) | [repo](https://github.com/luke-zhang-cs-py/Toronto-Transit-Distance-Matrix) |
 | **Almanac** | Calendar and multi-role booking platform, Flask + JWT | [live](https://luke-zhang-cs-py.github.io/Almanac-Main-Full-Stack-Calendar/app/) | [repo](https://github.com/luke-zhang-cs-py/Almanac-Main-Full-Stack-Calendar) |
 | **Dvoretsky Lab** | Chess coach with its own engine, built from a player's games | [live](https://luke-zhang-cs-py.github.io/Dvoerstky-AI-Chess-Coach/) | [repo](https://github.com/luke-zhang-cs-py/Dvoerstky-AI-Chess-Coach) |
+| **IPO Bot** | Research agent on Claude whose memos end in numbers code can check | [live](https://luke-zhang-cs-py.github.io/ipo-bot/app/) | [repo](https://github.com/luke-zhang-cs-py/ipo-bot) |
 | **Face Recognition Attendance** | Local OpenCV attendance, benchmarked for fairness on 97,698 faces | [live](https://luke-zhang-cs-py.github.io/Facial-Recognition-Software/camera/) | [repo](https://github.com/luke-zhang-cs-py/Facial-Recognition-Software) |
 | **AI Spam Classifier** | TF-IDF classifier that shows which words drove each verdict | [live](https://luke-zhang-cs-py.github.io/AI-Spam-Message-Classifier/app/) | [repo](https://github.com/luke-zhang-cs-py/AI-Spam-Message-Classifier) |
 | **Wallet FX** | Euro spending in CAD and USD at each purchase day's ECB rate, and what the card's markup cost | [live](https://luke-zhang-cs-py.github.io/Budgeting-EU-US-CAN-Almanac-Branch/app/) | [repo](https://github.com/luke-zhang-cs-py/Budgeting-EU-US-CAN-Almanac-Branch) |
@@ -51,7 +52,7 @@ python tools/make_og.py           # re-render og.png, the link-preview image
 
 `check_site.py` covers:
 - every section and project link;
-- that all seven demo GIFs load at their declared sizes;
+- that all eight demo GIFs load at their declared sizes;
 - layout at 1280, 820, 390 and 360 px;
 - dark mode and that it's remembered;
 - reduced motion;

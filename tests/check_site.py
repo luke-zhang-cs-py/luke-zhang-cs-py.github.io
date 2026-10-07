@@ -20,7 +20,7 @@ PAGE = (ROOT / "index.html").as_uri()
 SECTIONS = ["about", "projects", "skills", "contact"]
 SKILL_BLOCKS = 8
 WIDTHS = (1280, 820, 390, 360)
-DEMOS = 7
+DEMOS = 8
 NETWORK_CHECKS = 4          # the W3C validator, figures against the READMEs, commits against GitHub, and outbound links
 OFFLINE = "--offline" in sys.argv
 SHOTS = sys.argv[sys.argv.index("--shots") + 1] if "--shots" in sys.argv else None
@@ -180,7 +180,7 @@ def check_structure(pg):
     check("no Experience or Education section", pg.locator("#experience, .job, #education, .school").count() == 0)
     check("eight skill blocks, each with a heading and at least four skills",
           pg.locator(".skill").count() == SKILL_BLOCKS and pg.evaluate("[...document.querySelectorAll('.skill')].every(s => s.querySelector('h3') && s.querySelectorAll('li').length >= 4)"))
-    check("seven projects, each with a live demo, a write-up or guide, and its source",
+    check("eight projects, each with a live demo, a write-up or guide, and its source",
           pg.locator(".project").count() == DEMOS and pg.evaluate("""[...document.querySelectorAll('.project')].every(p => {
               const hrefs = [...p.querySelectorAll('.links a')].map(a => a.href);
               return p.querySelector('.links .btn.primary') && hrefs.some(h => /github\\.com\\/luke-zhang-cs-py\\/[^/]+$/.test(h)) && hrefs.length >= 3; })"""))
@@ -203,7 +203,7 @@ def check_components(pg):
     pg.click('.chip[data-filter="Computer vision"]')
     cv, count = visible(), pg.text_content("#projectCount")
     pg.click('.chip[data-filter="All"]')
-    check("the filter shows only a category's projects, and says how many", cv == ["faces"] and "1 of 7" in count and len(visible()) == DEMOS, (cv, count))
+    check("the filter shows only a category's projects, and says how many", cv == ["faces"] and "1 of %d" % DEMOS in count and len(visible()) == DEMOS, (cv, count))
     check("the pressed filter is announced as pressed", pg.get_attribute('.chip[data-filter="All"]', "aria-pressed") == "true")
 
     pg.keyboard.press("Control+k")
@@ -348,7 +348,7 @@ def check_motion(browser):
     rm.wait_for_timeout(300)
     loaded = rm.evaluate("[...document.querySelectorAll('.shot img')].filter(i => i.currentSrc.endsWith('.gif')).length")
     buttons = rm.locator(".play:visible").count()
-    # Seven buttons all named "Play demo" are indistinguishable in a screen reader's list of buttons.
+    # Eight buttons all named "Play demo" are indistinguishable in a screen reader's list of buttons.
     names = set(rm.evaluate("[...document.querySelectorAll('.play')].map(b => b.getAttribute('aria-label') || '')"))
     check("reduced motion: no GIF plays by itself, each has a Play button", loaded == 0 and buttons == DEMOS and len(names) == DEMOS and "" not in names,
           "%d loaded, %d buttons, %d distinct names" % (loaded, buttons, len(names)))
