@@ -388,6 +388,10 @@ def fetch(api, url):
         return str(e)[:80], ""
 
 
+class CommitCountUnavailable(Exception):
+    """GitHub didn't give a count, so the figure couldn't be checked (as opposed to failing the check)."""
+
+
 def commit_count(api, repo):
     """Commits on the default branch: ask for one per page and read the last page number."""
     headers = {"Accept": "application/vnd.github+json"}
@@ -395,7 +399,9 @@ def commit_count(api, repo):
         headers["Authorization"] = "Bearer " + os.environ["GITHUB_TOKEN"]
     r = api.get("https://api.github.com/repos/luke-zhang-cs-py/%s/commits?per_page=1" % repo, headers=headers, timeout=20000)
     if r.status != 200:
-        return None
+        # Say why: a refusal (403 with no requests left is the hourly limit for unauthenticated calls) is not a wrong figure.
+        limited = r.status == 403 and r.headers.get("x-ratelimit-remaining") == "0"
+        raise CommitCountUnavailable("GitHub's hourly API limit is used up; set GITHUB_TOKEN" if limited else "GitHub answered HTTP %s" % r.status)
     last = re.search(r'[?&]page=(\d+)>; rel="last"', r.headers.get("link", ""))
     return int(last.group(1)) if last else len(r.json())
 
@@ -403,7 +409,11 @@ def commit_count(api, repo):
 def check_commits(api, commits):
     """The commits figure: every project's count is a floor GitHub meets, and the headline is their sum, rounded down."""
     per_repo, shown = commits
-    actual = {repo: commit_count(api, repo) for repo, _ in per_repo}
+    try:
+        actual = {repo: commit_count(api, repo) for repo, _ in per_repo}
+    except CommitCountUnavailable as e:
+        check("the commits figure (%s) could be checked against GitHub" % shown, False, str(e))
+        return
     short = [(repo, claimed, actual[repo]) for repo, claimed in per_repo if not claimed or actual[repo] is None or actual[repo] < claimed]
     floor = sum(c for _, c in per_repo) // 10 * 10
     check("the commits figure (%s) is a floor GitHub meets in every repo" % shown,
