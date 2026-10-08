@@ -477,12 +477,12 @@
         'Benchmarked against seven prediction algorithms with permutation tests, a false-discovery correction, a holdout and trading costs.',
         'A keyless prediction bot on a GitHub Actions schedule: S&P 500 prices and the IPO pipeline from public sources, stored point-in-time in SQLite, scored against baselines with Diebold-Mariano tests. On 1.2 million out-of-sample stock predictions it finds no edge, and reports that.'
       ],
-      impact: [{ html: '<b data-tests>286</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: 'keyless bot at <b>100%</b> coverage' }],
+      impact: [{ html: '<b data-tests>346</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: 'keyless bot at <b>100%</b> coverage' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'SQLite', 'GitHub Actions', 'JavaScript', 'pytest'],
       demo: PAGES + 'ipo-bot/app/',
       more: [{ label: 'Write-up', url: PAGES + 'ipo-bot/' }],
       source: REPO + 'ipo-bot',
-      commits: 38,
+      commits: 44,
       gif: { src: PAGES + 'ipo-bot/demo.gif', w: 960, h: 600,
              alt: 'A price projection with bull, base and bear paths and 10-90% bands, then sizing a purchase as the stop-working price moves, then the memo checker catching a rating the numbers do not support' }
     },
