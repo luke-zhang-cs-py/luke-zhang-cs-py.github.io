@@ -589,6 +589,9 @@
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // ---- hero, about, contact links
+    // a link by its label, so reordering PROFILE.links cannot send the command menu to the wrong site
+    function linkUrl(label) { return PROFILE.links.find(function (l) { return l.label === label; }).url; }
+
     function linkButtons(primary) {
       return (primary ? '<a class="btn primary" href="#projects">View my work</a>' : '') + PROFILE.links.map(function (l) {
         return '<a class="btn" href="' + esc(l.url) + '"' + (l.icon === 'mail' ? '' : ' rel="me"') + '>' + ICONS[l.icon] + esc(l.label) + '</a>';
@@ -748,8 +751,8 @@
       { label: 'Copy my email address', hint: 'command', keywords: 'contact mail', run: function () {
           if (navigator.clipboard) navigator.clipboard.writeText(PROFILE.email).catch(function () {});
           formStatus.dataset.kind = 'ok'; formStatus.textContent = 'Copied ' + PROFILE.email + '.'; } },
-      { label: 'Open GitHub', hint: 'link', run: function () { window.location.href = PROFILE.links[0].url; } },
-      { label: 'Open LinkedIn', hint: 'link', run: function () { window.location.href = PROFILE.links[1].url; } }
+      { label: 'Open GitHub', hint: 'link', run: function () { window.location.href = linkUrl('GitHub'); } },
+      { label: 'Open LinkedIn', hint: 'link', run: function () { window.location.href = linkUrl('LinkedIn'); } }
     ]);
     var matches = [], active = 0, opener = null;
     function renderPalette() {
