@@ -70,11 +70,17 @@ It also guards privacy: it fails if the phone number from the resume appears any
 ## Layout
 
 ```
-index.html      the whole site
-404.html        GitHub Pages' not-found page
-og.png          1200×630 link preview (from tools/og.html)
+index.html        the whole site
+404.html          GitHub Pages' not-found page
+og.png            1200×630 link preview (from tools/og.html)
+headshot.jpg      the photo in the introduction
 favicon.svg
-docs/demo.gif   the recording above
-tests/          the browser check
-tools/          the demo recorder and the preview renderer
+docs/demo.gif     the recording above
+tests/            the browser check (check_site.py; its Python needs are in requirements.txt)
+tools/            the demo recorder and the preview renderer
+notes/            the code audit
+.github/          the checks workflow
 ```
+
+The pages and images stay at the root on purpose: GitHub Pages serves them at those paths, and link previews
+point at og.png there.
