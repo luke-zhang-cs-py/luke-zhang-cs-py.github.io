@@ -589,8 +589,12 @@
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // ---- hero, about, contact links
-    // a link by its label, so reordering PROFILE.links cannot send the command menu to the wrong site
-    function linkUrl(label) { return PROFILE.links.find(function (l) { return l.label === label; }).url; }
+    // a link by its label, so reordering PROFILE.links cannot send the command menu to the wrong site;
+    // '' when no link has that label (renamed or removed), so the menu leaves the command out instead of throwing
+    function linkUrl(label) {
+      var link = PROFILE.links.find(function (l) { return l.label === label; });
+      return link && link.url ? link.url : '';
+    }
 
     function linkButtons(primary) {
       return (primary ? '<a class="btn primary" href="#projects">View my work</a>' : '') + PROFILE.links.map(function (l) {
@@ -751,9 +755,9 @@
       { label: 'Copy my email address', hint: 'command', keywords: 'contact mail', run: function () {
           if (navigator.clipboard) navigator.clipboard.writeText(PROFILE.email).catch(function () {});
           formStatus.dataset.kind = 'ok'; formStatus.textContent = 'Copied ' + PROFILE.email + '.'; } },
-      { label: 'Open GitHub', hint: 'link', run: function () { window.location.href = linkUrl('GitHub'); } },
-      { label: 'Open LinkedIn', hint: 'link', run: function () { window.location.href = linkUrl('LinkedIn'); } }
-    ]);
+    ], ['GitHub', 'LinkedIn'].filter(linkUrl).map(function (name) {
+      return { label: 'Open ' + name, hint: 'link', run: function () { window.location.href = linkUrl(name); } };
+    }));
     var matches = [], active = 0, opener = null;
     function renderPalette() {
       var q = input.value.trim().toLowerCase();
