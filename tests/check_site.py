@@ -5,7 +5,7 @@
 Structure, the demo GIFs, the nav, dark mode, layout at three widths, reduced motion, print,
 the link preview, valid dates, a privacy guard, that the page's figures add up and match each
 project's own README, that the README states the right number of checks, and that every
-outbound link answers, and the W3C validator finds no errors. --offline skips the three checks
+outbound link answers, and the W3C validator finds no errors. --offline skips the four checks
 that need the network.
 
 --coverage writes an HTML report of which lines of the page's JavaScript and which CSS rules

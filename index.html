@@ -472,18 +472,18 @@
       features: [
         'A tool-using agent over SEC EDGAR, XBRL financials, FRED and market data, with every calculation done in a calculator tool.',
         'Eleven accuracy checks before each answer, and a KEY NUMBERS block that verify.py recomputes: market cap, EV, multiples and scenario maths.',
-        'Portfolio mode sizes a buy by the smallest of four limits from your own rules; the browser demo is the same code, tested against the Python.',
-        'A browser terminal lists all 3,300 NYSE tickers the SEC publishes, draws the bull, base and bear cases of a memo as a price projection: 2,000 simulated paths with 10-90% bands, the stop-working price and the rating they imply, and ranks trade ideas by expected return, reward to risk or chance of hitting the stop.',
+        'Portfolio mode sizes a buy by the smallest of the limits in your own rules; the browser demo is the same code, tested against the Python.',
+        'A browser terminal lists every NYSE ticker the SEC lists, draws the bull, base and bear cases of a memo as a price projection: 2,000 simulated paths with 10-90% bands, the stop-working price and the rating they imply, and ranks trade ideas by expected return, reward to risk or chance of hitting the stop.',
         'Benchmarked against seven prediction algorithms with permutation tests, a false-discovery correction, a holdout and trading costs.',
         'A keyless prediction bot on a GitHub Actions schedule: S&P 500 prices and the IPO pipeline from public sources, stored point-in-time in SQLite with index membership as it stood on each day, scored against baselines with Diebold-Mariano tests. On 1.2 million out-of-sample stock predictions it finds no edge, and reports that.',
         'An accuracy audit recomputed its numbers independently and hunted for look-ahead: the fixes made every IPO feature point-in-time and taught the leakage test to catch four planted leaks. The pre-listing IPO model scores PR-AUC 0.682 against a 0.417 base rate, and the report shows that the price-range revision alone gets 0.667.'
       ],
-      impact: [{ html: '<b data-tests>688</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
+      impact: [{ html: '<b data-tests>715</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'SQLite', 'GitHub Actions', 'JavaScript', 'pytest'],
       demo: PAGES + 'ipo-bot/app/',
       more: [{ label: 'Write-up', url: PAGES + 'ipo-bot/' }],
       source: REPO + 'ipo-bot',
-      commits: 61,
+      commits: 66,
       gif: { src: PAGES + 'ipo-bot/demo.gif', w: 960, h: 600,
              alt: 'A price projection with bull, base and bear paths and 10-90% bands, then sizing a purchase as the stop-working price moves, then the memo checker catching a rating the numbers do not support' }
     },
