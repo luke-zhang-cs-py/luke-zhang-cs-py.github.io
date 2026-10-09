@@ -455,13 +455,13 @@
         'Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.',
         "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines."
       ],
-      impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+41</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
-               { html: '<b data-tests data-derived title="75 regression, 39 rules, 37 titled-player, 12 coach, 56 browser and 40 perft checks">259</b> checks' }],
+      impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+83.5</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
+               { html: '<b data-tests data-derived title="94 regression, 50 rules, 37 titled-player, 25 app, 22 integration, 18 analysis, 17 sparring, 12 coach, 10 engine, 40 perft, 83 browser and 6 single-file checks">414</b> checks' }],
       tags: ['JavaScript', 'Web Workers', 'Stockfish', 'UCI', 'Lichess API', 'Playwright'],
       demo: PAGES + 'Dvoerstky-AI-Chess-Coach/',
       more: [{ label: 'Guide', url: REPO + 'Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md' }],
       source: REPO + 'Dvoerstky-AI-Chess-Coach',
-      commits: 23,
+      commits: 26,
       gif: { src: PAGES + 'Dvoerstky-AI-Chess-Coach/docs/demo.gif', w: 960, h: 795,
              alt: 'The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder' }
     },
