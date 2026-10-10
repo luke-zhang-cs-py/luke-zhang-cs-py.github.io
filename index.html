@@ -453,15 +453,15 @@
         'A chess engine from scratch: 0x88 move generation, alpha-beta with quiescence, a Zobrist transposition table and null-move pruning.',
         "A \"mirror\" opponent that loses centipawns at the player's own rate and answers from their opening repertoire.",
         'Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.',
-        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines, with 99.96% of the code's lines run by the checks."
+        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines, with all 4,713 of the code's lines run by the checks."
       ],
       impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+83.5</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
-               { html: '<b data-tests data-derived title="96 regression, 52 rules, 46 app, 37 titled-player, 22 integration, 21 sparring, 21 coach, 18 analysis, 10 engine, 40 perft, 110 browser and 6 single-file checks">479</b> checks' }],
+               { html: '<b data-tests data-derived title="96 regression, 77 app, 61 rules, 42 titled-player, 32 analysis, 30 sparring, 28 coach, 23 engine, 22 integration, 40 perft, 142 browser and 6 single-file checks">599</b> checks' }],
       tags: ['JavaScript', 'Web Workers', 'Stockfish', 'UCI', 'Lichess API', 'Playwright'],
       demo: PAGES + 'Dvoerstky-AI-Chess-Coach/',
       more: [{ label: 'Guide', url: REPO + 'Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md' }],
       source: REPO + 'Dvoerstky-AI-Chess-Coach',
-      commits: 28,
+      commits: 29,
       gif: { src: PAGES + 'Dvoerstky-AI-Chess-Coach/docs/demo.gif', w: 960, h: 795,
              alt: 'The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder' }
     },
@@ -496,12 +496,12 @@
         'Benchmarked on all of FairFace: a brightness-based quality gate flagged 38.8% of Black faces against 18.5% of White faces, and was rebuilt to be scale-free.',
         'Match thresholds calibrated by gallery size over 4.77 billion impostor pairs, since a fixed cut fails as enrolment grows.'
       ],
-      impact: [{ html: '<b>97,698</b> faces benchmarked' }, { html: 'detection <b>99.95%</b>' }, { html: 'bias <b>2.15×</b> → <b>1.24×</b>' }, { html: '<b data-tests>446</b> tests' }],
+      impact: [{ html: '<b>97,698</b> faces benchmarked' }, { html: 'detection <b>99.95%</b>' }, { html: 'bias <b>2.15×</b> → <b>1.24×</b>' }, { html: '<b data-tests>856</b> tests' }],
       tags: ['Python', 'OpenCV', 'Flask', 'SQLite', 'MediaPipe'],
       demo: PAGES + 'Facial-Recognition-Software/camera/',
       more: [{ label: 'Write-up', url: PAGES + 'Facial-Recognition-Software/' }],
       source: REPO + 'Facial-Recognition-Software',
-      commits: 62,
+      commits: 68,
       gif: { src: PAGES + 'Facial-Recognition-Software/demo.gif', w: 900, h: 570,
              alt: 'A face tracked live: the instruction changes from No face detected to Move closer to Head upright to Ready, then a second person appears and the verdict becomes One person only' }
     },
