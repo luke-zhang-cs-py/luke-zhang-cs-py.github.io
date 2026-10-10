@@ -453,15 +453,15 @@
         'A chess engine from scratch: 0x88 move generation, alpha-beta with quiescence, a Zobrist transposition table and null-move pruning.',
         "A \"mirror\" opponent that loses centipawns at the player's own rate and answers from their opening repertoire.",
         'Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.',
-        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines."
+        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines, with 99.96% of the code's lines run by the checks."
       ],
       impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+83.5</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
-               { html: '<b data-tests data-derived title="94 regression, 50 rules, 37 titled-player, 25 app, 22 integration, 18 analysis, 17 sparring, 12 coach, 10 engine, 40 perft, 83 browser and 6 single-file checks">414</b> checks' }],
+               { html: '<b data-tests data-derived title="96 regression, 52 rules, 45 app, 37 titled-player, 22 integration, 21 sparring, 21 coach, 18 analysis, 10 engine, 40 perft, 110 browser and 6 single-file checks">478</b> checks' }],
       tags: ['JavaScript', 'Web Workers', 'Stockfish', 'UCI', 'Lichess API', 'Playwright'],
       demo: PAGES + 'Dvoerstky-AI-Chess-Coach/',
       more: [{ label: 'Guide', url: REPO + 'Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md' }],
       source: REPO + 'Dvoerstky-AI-Chess-Coach',
-      commits: 26,
+      commits: 27,
       gif: { src: PAGES + 'Dvoerstky-AI-Chess-Coach/docs/demo.gif', w: 960, h: 795,
              alt: 'The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder' }
     },
@@ -478,12 +478,12 @@
         'A keyless prediction bot on a GitHub Actions schedule: S&P 500 prices and the IPO pipeline from public sources, stored point-in-time in SQLite with index membership as it stood on each day (renames and departed stocks included), scored against baselines with Diebold-Mariano tests. On 1.2 million out-of-sample stock predictions it finds no edge, and reports that.',
         'An accuracy audit recomputed its numbers independently and hunted for look-ahead: the fixes made every IPO feature point-in-time and taught the leakage test to catch four planted leaks. The pre-listing IPO model scores PR-AUC 0.682 against a 0.417 base rate, and the report shows that the price-range revision alone gets 0.667.'
       ],
-      impact: [{ html: '<b data-tests>715</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
+      impact: [{ html: '<b data-tests>721</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'SQLite', 'GitHub Actions', 'JavaScript', 'pytest'],
       demo: PAGES + 'ipo-bot/app/',
       more: [{ label: 'Write-up', url: PAGES + 'ipo-bot/' }],
       source: REPO + 'ipo-bot',
-      commits: 66,
+      commits: 72,
       gif: { src: PAGES + 'ipo-bot/demo.gif', w: 960, h: 600,
              alt: 'A price projection with bull, base and bear paths and 10-90% bands, then sizing a purchase as the stop-working price moves, then the memo checker catching a rating the numbers do not support' }
     },
