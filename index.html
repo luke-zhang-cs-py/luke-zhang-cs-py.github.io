@@ -417,7 +417,7 @@
         'Live service alerts remove closed lines from the graph, so trips route around them.',
         'The browser demo is a JavaScript port of the Python search; the build refuses to publish if they disagree at any stop.'
       ],
-      impact: [{ html: '<b>516</b> stops verified Python vs JS' }, { html: '<b data-tests>257</b> tests · <b>100%</b> coverage' }],
+      impact: [{ html: '<b>516</b> stops verified Python vs JS' }, { html: '<b data-tests>262</b> tests · <b>100%</b> coverage' }],
       tags: ['Python', 'Flask', 'REST API', 'Leaflet', 'GTFS-realtime', 'JavaScript'],
       demo: PAGES + 'Toronto-Transit-Distance-Matrix/app/',
       more: [{ label: 'Write-up', url: PAGES + 'Toronto-Transit-Distance-Matrix/' }],
@@ -436,7 +436,7 @@
         'Availability computed from recurring weekly hours, blocked dates and bookings; five kinds of email, each sent exactly once.',
         'Refuses to start in production with the committed development secret that signs every session.'
       ],
-      impact: [{ html: '<b data-tests>537</b> tests · <b>100%</b> of 1,975 statements' }, { html: '<b>21</b> scenarios verified Python vs JS' }],
+      impact: [{ html: '<b data-tests>544</b> tests · <b>100%</b> of 1,972 statements' }, { html: '<b>21</b> scenarios verified Python vs JS' }],
       tags: ['Python', 'Flask', 'JWT', 'RBAC', 'PostgreSQL', 'SQLite', 'SMTP'],
       demo: PAGES + 'Almanac-Main-Full-Stack-Calendar/app/',
       more: [{ label: 'Blank calendar', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/calendar.html' }, { label: 'Write-up', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/' }],
@@ -453,10 +453,10 @@
         'A chess engine from scratch: 0x88 move generation, alpha-beta with quiescence, a Zobrist transposition table and null-move pruning.',
         "A \"mirror\" opponent that loses centipawns at the player's own rate and answers from their opening repertoire.",
         'Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.',
-        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines, with all 4,731 of the code's lines run by the checks."
+        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines, with all 4,732 of the code's lines run by the checks."
       ],
       impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+83.5</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
-               { html: '<b data-tests data-derived title="96 regression, 81 app, 62 rules, 42 titled-player, 32 analysis, 30 sparring, 29 coach, 23 engine, 22 integration, 40 perft, 146 browser and 6 single-file checks">609</b> checks' }],
+               { html: '<b data-tests data-derived title="96 regression, 83 app, 62 rules, 42 titled-player, 32 analysis, 30 sparring, 29 coach, 23 engine, 22 integration, 40 perft, 196 browser and 6 single-file checks">661</b> checks' }],
       tags: ['JavaScript', 'Web Workers', 'Stockfish', 'UCI', 'Lichess API', 'Playwright'],
       demo: PAGES + 'Dvoerstky-AI-Chess-Coach/',
       more: [{ label: 'Guide', url: REPO + 'Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md' }],
@@ -534,7 +534,7 @@
         'Imports from a synced folder, QFX, a CSV in any layout, or a receipt screenshot read by local OCR, and refuses a row rather than guess its currency.',
         'Four layered packages, with the layering asserted by a test instead of left to convention.'
       ],
-      impact: [{ html: 'card markup <b>2.49%</b> made visible' }, { html: '<b data-tests>909</b> tests · <b>100%</b> coverage' }],
+      impact: [{ html: 'card markup <b>2.49%</b> made visible' }, { html: '<b data-tests>922</b> tests · <b>100%</b> coverage' }],
       tags: ['Python', 'Flask', 'SQLite', 'OCR', 'JavaScript'],
       demo: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/app/',
       more: [{ label: 'Receipt capture', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/capture/' }, { label: 'Write-up', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/' }],
@@ -553,7 +553,7 @@
         'Money stored as integer cents, and currencies never summed without a rate.',
         'Local only: no account, no bank connection; exports CSV for reconciliation.'
       ],
-      impact: [{ html: '<b>2</b> taps for a regular purchase' }, { html: '<b data-tests>213</b> tests' }],
+      impact: [{ html: '<b>2</b> taps for a regular purchase' }, { html: '<b data-tests>214</b> tests' }],
       tags: ['Python', 'Flask', 'SQLite', 'JavaScript'],
       demo: PAGES + 'tally/app/',
       more: [{ label: 'Write-up', url: PAGES + 'tally/' }],
