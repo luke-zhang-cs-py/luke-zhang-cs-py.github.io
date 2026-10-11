@@ -453,15 +453,15 @@
         'A chess engine from scratch: 0x88 move generation, alpha-beta with quiescence, a Zobrist transposition table and null-move pruning.',
         "A \"mirror\" opponent that loses centipawns at the player's own rate and answers from their opening repertoire.",
         'Stockfish in a Web Worker grades each move; mistakes are mined by winning chances and scheduled as spaced-repetition drills.',
-        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines, with all 4,713 of the code's lines run by the checks."
+        "Tested like an engine: perft against Stockfish's counts, SPRT between versions, EPD suites and matches against reference engines, with all 4,731 of the code's lines run by the checks."
       ],
       impact: [{ html: 'perft on <b>21</b> positions' }, { html: '<b>+83.5</b> Elo by SPRT' }, { html: 'about <b>1730</b> against Stockfish and Maia' },
-               { html: '<b data-tests data-derived title="96 regression, 77 app, 61 rules, 42 titled-player, 32 analysis, 30 sparring, 28 coach, 23 engine, 22 integration, 40 perft, 142 browser and 6 single-file checks">599</b> checks' }],
+               { html: '<b data-tests data-derived title="96 regression, 81 app, 62 rules, 42 titled-player, 32 analysis, 30 sparring, 29 coach, 23 engine, 22 integration, 40 perft, 146 browser and 6 single-file checks">609</b> checks' }],
       tags: ['JavaScript', 'Web Workers', 'Stockfish', 'UCI', 'Lichess API', 'Playwright'],
       demo: PAGES + 'Dvoerstky-AI-Chess-Coach/',
       more: [{ label: 'Guide', url: REPO + 'Dvoerstky-AI-Chess-Coach/blob/main/notes/GUIDE.md' }],
       source: REPO + 'Dvoerstky-AI-Chess-Coach',
-      commits: 29,
+      commits: 30,
       gif: { src: PAGES + 'Dvoerstky-AI-Chess-Coach/docs/demo.gif', w: 960, h: 795,
              alt: 'The Strength tab re-measuring as the window narrows to 30 days, then a sparring game in which Stockfish grades 3.Bc4 a blunder' }
     },
@@ -478,12 +478,12 @@
         'A keyless prediction bot on a GitHub Actions schedule: S&P 500 prices and the IPO pipeline from public sources, stored point-in-time in SQLite with index membership as it stood on each day (renames and departed stocks included), scored against baselines with Diebold-Mariano tests. On 1.2 million out-of-sample stock predictions it finds no edge, and reports that.',
         'An accuracy audit recomputed its numbers independently and hunted for look-ahead: the fixes made every IPO feature point-in-time and taught the leakage test to catch four planted leaks. The pre-listing IPO model scores PR-AUC 0.682 against a 0.417 base rate, and the report shows that the price-range revision alone gets 0.667.'
       ],
-      impact: [{ html: '<b data-tests>721</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
+      impact: [{ html: '<b data-tests>738</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'SQLite', 'GitHub Actions', 'JavaScript', 'pytest'],
       demo: PAGES + 'ipo-bot/app/',
       more: [{ label: 'Write-up', url: PAGES + 'ipo-bot/' }],
       source: REPO + 'ipo-bot',
-      commits: 72,
+      commits: 73,
       gif: { src: PAGES + 'ipo-bot/demo.gif', w: 960, h: 600,
              alt: 'A price projection with bull, base and bear paths and 10-90% bands, then sizing a purchase as the stop-working price moves, then the memo checker catching a rating the numbers do not support' }
     },
@@ -496,12 +496,12 @@
         'Benchmarked on all of FairFace: a brightness-based quality gate flagged 38.8% of Black faces against 18.5% of White faces, and was rebuilt to be scale-free.',
         'Match thresholds calibrated by gallery size over 4.77 billion impostor pairs, since a fixed cut fails as enrolment grows.'
       ],
-      impact: [{ html: '<b>97,698</b> faces benchmarked' }, { html: 'detection <b>99.95%</b>' }, { html: 'bias <b>2.15×</b> → <b>1.24×</b>' }, { html: '<b data-tests>856</b> tests' }],
+      impact: [{ html: '<b>97,698</b> faces benchmarked' }, { html: 'detection <b>99.95%</b>' }, { html: 'bias <b>2.15×</b> → <b>1.24×</b>' }, { html: '<b data-tests>884</b> tests' }],
       tags: ['Python', 'OpenCV', 'Flask', 'SQLite', 'MediaPipe'],
       demo: PAGES + 'Facial-Recognition-Software/camera/',
       more: [{ label: 'Write-up', url: PAGES + 'Facial-Recognition-Software/' }],
       source: REPO + 'Facial-Recognition-Software',
-      commits: 68,
+      commits: 70,
       gif: { src: PAGES + 'Facial-Recognition-Software/demo.gif', w: 900, h: 570,
              alt: 'A face tracked live: the instruction changes from No face detected to Move closer to Head upright to Ready, then a second person appears and the verdict becomes One person only' }
     },
