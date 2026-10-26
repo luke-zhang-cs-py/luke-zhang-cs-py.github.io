@@ -1,0 +1,16 @@
+# Python coverage: python -m coverage run -m pytest -q tests && python -m coverage report
+# (CI runs exactly that, and fails under 100% of lines and branches).
+[run]
+branch = True
+# The shipped Python is tools/: the demo recorder and the preview renderer. tests/ is the
+# checking code itself (check_site.py is the browser check, run on its own in CI).
+source = tools
+
+[report]
+fail_under = 100
+show_missing = True
+# The one exclusion: an `if __name__ == "__main__":` guard whose body only calls main(), which
+# the tests call directly. Setting exclude_lines replaces coverage's defaults, so a
+# "pragma: no cover" comment excludes nothing here.
+exclude_lines =
+    if __name__ == .__main__.:

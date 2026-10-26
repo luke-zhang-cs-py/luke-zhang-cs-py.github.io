@@ -417,7 +417,7 @@
         'Live service alerts remove closed lines from the graph, so trips route around them.',
         'The browser demo is a JavaScript port of the Python search; the build refuses to publish if they disagree at any stop.'
       ],
-      impact: [{ html: '<b>516</b> stops verified Python vs JS' }, { html: '<b data-tests>262</b> tests · <b>100%</b> coverage' }],
+      impact: [{ html: '<b>516</b> stops verified Python vs JS' }, { html: '<b data-tests>315</b> tests · <b>100%</b> coverage' }],
       tags: ['Python', 'Flask', 'REST API', 'Leaflet', 'GTFS-realtime', 'JavaScript'],
       demo: PAGES + 'Toronto-Transit-Distance-Matrix/app/',
       more: [{ label: 'Write-up', url: PAGES + 'Toronto-Transit-Distance-Matrix/' }],
@@ -436,7 +436,7 @@
         'Availability computed from recurring weekly hours, blocked dates and bookings; five kinds of email, each sent exactly once.',
         'Refuses to start in production with the committed development secret that signs every session.'
       ],
-      impact: [{ html: '<b data-tests>544</b> tests · <b>100%</b> of 1,972 statements' }, { html: '<b>21</b> scenarios verified Python vs JS' }],
+      impact: [{ html: '<b data-tests>655</b> tests · <b>100%</b> of 2,733 statements' }, { html: '<b>21</b> scenarios verified Python vs JS' }],
       tags: ['Python', 'Flask', 'JWT', 'RBAC', 'PostgreSQL', 'SQLite', 'SMTP'],
       demo: PAGES + 'Almanac-Main-Full-Stack-Calendar/app/',
       more: [{ label: 'Blank calendar', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/calendar.html' }, { label: 'Write-up', url: PAGES + 'Almanac-Main-Full-Stack-Calendar/' }],
@@ -478,7 +478,7 @@
         'A keyless prediction bot on a GitHub Actions schedule: S&P 500 prices and the IPO pipeline from public sources, stored point-in-time in SQLite with index membership as it stood on each day (renames and departed stocks included), scored against baselines with Diebold-Mariano tests. On 1.2 million out-of-sample stock predictions it finds no edge, and reports that.',
         'An accuracy audit recomputed its numbers independently and hunted for look-ahead: the fixes made every IPO feature point-in-time and taught the leakage test to catch four planted leaks. The pre-listing IPO model scores PR-AUC 0.682 against a 0.417 base rate, and the report shows that the price-range revision alone gets 0.667.'
       ],
-      impact: [{ html: '<b data-tests>738</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
+      impact: [{ html: '<b data-tests>786</b> tests' }, { html: '<b>11</b> accuracy checks per memo' }, { html: '<b>0 of 36</b> simple signals survive the correction' }, { html: '<b>100%</b> line and branch coverage' }],
       tags: ['Python', 'Claude API', 'Tool use', 'SEC EDGAR', 'SQLite', 'GitHub Actions', 'JavaScript', 'pytest'],
       demo: PAGES + 'IPO-and-Equity-Research-Agent/app/',
       more: [{ label: 'Write-up', url: PAGES + 'IPO-and-Equity-Research-Agent/' }],
@@ -495,9 +495,9 @@
         'Detection, LBPH recognition, liveness checks and quality scoring, with a CLI for register, train, run and report.',
         'Benchmarked on all of FairFace: a brightness-based quality gate flagged 38.8% of Black faces against 18.5% of White faces, and was rebuilt to be scale-free.',
         'Match thresholds calibrated by gallery size over 4.77 billion impostor pairs, since a fixed cut fails as enrolment grows.',
-        'Tested with no webcam, weights or face data in the repo: 100% of 3,080 statements and every branch run in CI, with mutation testing on the decision, liveness and database code.'
+        'Tested with no webcam, weights or face data in the repo: 100% of 4,495 statements and every branch run in CI, with mutation testing on the decision, liveness and database code.'
       ],
-      impact: [{ html: '<b>97,698</b> faces benchmarked' }, { html: 'detection <b>99.95%</b>' }, { html: 'bias <b>2.15×</b> → <b>1.24×</b>' }, { html: '<b data-tests>913</b> tests' }],
+      impact: [{ html: '<b>97,698</b> faces benchmarked' }, { html: 'detection <b>99.95%</b>' }, { html: 'bias <b>2.15×</b> → <b>1.24×</b>' }, { html: '<b data-tests>1,050</b> tests' }],
       tags: ['Python', 'OpenCV', 'Flask', 'SQLite', 'MediaPipe'],
       demo: PAGES + 'Facial-Recognition-Software/camera/',
       more: [{ label: 'Write-up', url: PAGES + 'Facial-Recognition-Software/' }],
@@ -515,7 +515,7 @@
         'Naive Bayes and logistic regression compared on out-of-fold predictions, with the vectoriser refitted inside every fold.',
         'Decision threshold chosen for the best F1 with precision held at 0.90, and saved inside the model artifact.'
       ],
-      impact: [{ html: 'F1 <b>0.850</b> at precision <b>0.90</b>' }, { html: '<b data-tests>158</b> tests · <b>100%</b> coverage' }],
+      impact: [{ html: 'F1 <b>0.850</b> at precision <b>0.90</b>' }, { html: '<b data-tests>229</b> tests · <b>100%</b> coverage' }],
       tags: ['Python', 'scikit-learn', 'pandas', 'Flask', 'JavaScript'],
       demo: PAGES + 'AI-Spam-Message-Classifier/app/',
       more: [{ label: 'Write-up', url: PAGES + 'AI-Spam-Message-Classifier/' }],
@@ -534,7 +534,7 @@
         'Imports from a synced folder, QFX, a CSV in any layout, or a receipt screenshot read by local OCR, and refuses a row rather than guess its currency.',
         'Four layered packages, with the layering asserted by a test instead of left to convention.'
       ],
-      impact: [{ html: 'card markup <b>2.49%</b> made visible' }, { html: '<b data-tests>922</b> tests · <b>100%</b> coverage' }],
+      impact: [{ html: 'card markup <b>2.49%</b> made visible' }, { html: '<b data-tests>982</b> tests · <b>100%</b> coverage' }],
       tags: ['Python', 'Flask', 'SQLite', 'OCR', 'JavaScript'],
       demo: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/app/',
       more: [{ label: 'Receipt capture', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/capture/' }, { label: 'Write-up', url: PAGES + 'Budgeting-EU-US-CAN-Almanac-Branch/' }],
@@ -553,7 +553,7 @@
         'Money stored as integer cents, and currencies never summed without a rate.',
         'Local only: no account, no bank connection; exports CSV for reconciliation.'
       ],
-      impact: [{ html: '<b>2</b> taps for a regular purchase' }, { html: '<b data-tests>214</b> tests' }],
+      impact: [{ html: '<b>2</b> taps for a regular purchase' }, { html: '<b data-tests>279</b> tests' }],
       tags: ['Python', 'Flask', 'SQLite', 'JavaScript'],
       demo: PAGES + 'tally/app/',
       more: [{ label: 'Write-up', url: PAGES + 'tally/' }],

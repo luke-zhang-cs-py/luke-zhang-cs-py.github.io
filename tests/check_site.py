@@ -2,14 +2,16 @@
 
     python tests/check_site.py [--shots DIR] [--coverage coverage.html] [--offline]
 
-Structure, the demo GIFs, the nav, dark mode, layout at three widths, reduced motion, print,
-the link preview, valid dates, a privacy guard, that the page's figures add up and match each
-project's own README, that the README states the right number of checks, and that every
-outbound link answers, and the W3C validator finds no errors. --offline skips the four checks
-that need the network.
+Structure, the demo GIFs, the nav, the command palette and the contact form, dark mode, layout
+at four widths, reduced motion, print, blocked storage and missing browser features, edited
+content, the link preview, valid dates, a privacy guard, that the page's figures add up and match
+each project's own README, that the README states the right number of checks, that every
+outbound link answers, and that the W3C validator finds no errors. --offline skips the four
+checks that need the network.
 
---coverage writes an HTML report of which lines of the page's JavaScript and which CSS rules
-ran, merged over every scenario above (V8 block coverage and Chrome's CSS rule usage).
+Every scenario runs under V8 block coverage, and one check fails unless every line, branch and
+function of the page's own JavaScript ran in at least one of them. --coverage also writes an
+HTML report of which lines and branches ran and which CSS rules were used (Chrome's rule usage).
 """
 import html as htmllib, json, os, pathlib, re, sys
 from PIL import Image
@@ -57,16 +59,26 @@ def scroll_to(pg, target):
 
 # ---------------------------------------------------------------- coverage
 class Coverage:
-    """Per page: V8 block coverage of the page's own scripts and Chrome's CSS rule usage, merged by source."""
+    """Per page: V8 block coverage of the page's own scripts and Chrome's CSS rule usage, merged by source.
+
+    Lines: a line ran if its first character did. Branches: every block V8 counts on its own (each
+    arm of an if/else and of ?:, the right side of && and ||, a catch, a loop body, and the code
+    after an early return), hit if it ran in any scenario. V8 reports a block only when its count
+    differs from the code around it, so an if with no else adds one branch, not two, and a block
+    that always ran exactly as often as its surroundings is never listed, because it cannot have
+    been missed. Functions: every function's own range."""
     def __init__(self):
         self.js = {}         # script source -> covered flag per character
+        self.blocks = {}     # script source -> {(start, end)} block ranges V8 reported
+        self.funcs = {}      # script source -> {(start, end): name}
+        self.at = {}         # script source -> the index.html line it starts on, less one
         self.css = {}        # stylesheet text -> {(start, end): used}
-        self.sessions = {}   # page -> (cdp session, {scriptId: url})
+        self.sessions = {}   # page -> (cdp session, {scriptId: (url, first line)})
 
     def attach(self, pg):
         s = pg.context.new_cdp_session(pg)
         scripts = {}
-        s.on("Debugger.scriptParsed", lambda e: scripts.__setitem__(e["scriptId"], e["url"]))
+        s.on("Debugger.scriptParsed", lambda e: scripts.__setitem__(e["scriptId"], (e["url"], e["startLine"])))
         for cmd in ("Debugger.enable", "Profiler.enable", "DOM.enable", "CSS.enable"):
             s.send(cmd)
         s.send("Profiler.startPreciseCoverage", {"callCount": True, "detailed": True})
@@ -79,14 +91,22 @@ class Coverage:
 
     def collect(self, pg, keep=False):
         s, scripts = self.sessions[pg] if keep else self.sessions.pop(pg)
-        for fn in s.send("Profiler.takePreciseCoverage")["result"]:
-            if scripts.get(fn["scriptId"]) != PAGE: continue
-            src = s.send("Debugger.getScriptSource", {"scriptId": fn["scriptId"]})["scriptSource"]
+        for script in s.send("Profiler.takePreciseCoverage")["result"]:
+            url, at = scripts.get(script["scriptId"], (None, 0))
+            if url != PAGE: continue
+            src = s.send("Debugger.getScriptSource", {"scriptId": script["scriptId"]})["scriptSource"]
+            self.at[src] = at
+            spans = []   # (start, end, ran)
+            for f in script["functions"]:
+                rs = [(r["startOffset"], min(r["endOffset"], len(src)), r["count"] > 0) for r in f["ranges"]]
+                spans += rs
+                self.funcs.setdefault(src, {})[rs[0][:2]] = f["functionName"]
+                if f["isBlockCoverage"]:
+                    self.blocks.setdefault(src, set()).update(r[:2] for r in rs[1:])
             flags = [False] * len(src)
-            for f in fn["functions"]:              # ranges run outer to inner, so inner ones win
-                for r in f["ranges"]:
-                    end = min(r["endOffset"], len(src))
-                    flags[r["startOffset"]:end] = [r["count"] > 0] * (end - r["startOffset"])
+            # outer ranges first, so a nested range always overrides the one around it
+            for a, b, ran in sorted(spans, key=lambda r: (r[0], -r[1])):
+                flags[a:b] = [ran] * (b - a)
             seen = self.js.get(src, [False] * len(src))
             self.js[src] = [a or b for a, b in zip(seen, flags)]
         for u in s.send("CSS.stopRuleUsageTracking")["ruleUsage"]:
@@ -110,53 +130,90 @@ class Coverage:
             rows.append((None, ""))
         return rows
 
+    def spans(self, table):
+        """(ran, where, text) per block or function: it ran if any of its characters did in any scenario."""
+        out = []
+        for src, spans in table.items():
+            flags = self.js[src]
+            names = spans if isinstance(spans, dict) else {}
+            for a, b in sorted(spans):
+                text = src[a:b].split("\n")[0].strip()[:80]
+                name = names.get((a, b)) or ""
+                out.append((any(flags[a:b]), "index.html line %d" % (self.at[src] + src.count("\n", 0, a) + 1), (name + ": " if name else "") + text))
+        return out
+
+    def summary(self):
+        code = [r for r in self.lines() if r[0] is not None]
+        branches, funcs = self.spans(self.blocks), self.spans(self.funcs)
+        return {"lines": (sum(r[0] for r in code), len(code)),
+                "branches": (sum(r[0] for r in branches), len(branches)),
+                "functions": (sum(r[0] for r in funcs), len(funcs)),
+                "missed": [(kind, where, text) for kind, rows in (("branch", branches), ("function", funcs))
+                           for ran, where, text in rows if not ran]}
+
+    def complete(self):
+        """Whether every line, branch and function ran, and the figures."""
+        s = self.summary()
+        return bool(self.js) and all(s[k][0] == s[k][1] for k in ("lines", "branches", "functions")), s
+
     def report(self, out):
-        rows = self.lines()
-        code = [r for r in rows if r[0] is not None]
-        hit = sum(r[0] for r in code)
+        rows, s = self.lines(), self.summary()
         rules = [(text[a:b].split("{")[0].strip(), used) for text, rs in self.css.items() for (a, b), used in sorted(rs.items())]
         used = sum(u for _, u in rules)
-        js_pct, css_pct = 100 * hit / max(len(code), 1), 100 * used / max(len(rules), 1)
+        pct = lambda hit, n: 100 * hit / max(n, 1)
+        figures = " · ".join("<b>JavaScript %s: %d of %d (%.1f%%)</b>" % (k, s[k][0], s[k][1], pct(*s[k])) for k in ("lines", "branches", "functions"))
         listing = "".join('<div class="%s"><span>%s</span>%s</div>' % ("gap" if r is None else ("hit" if r else "miss"),
                           "" if r is None else ("✓" if r else "✗"), htmllib.escape(l) or "&nbsp;") for r, l in rows)
+        missed = "".join("<li>%s, %s: <code>%s</code></li>" % (k, w, htmllib.escape(t)) for k, w, t in s["missed"]) or "<li>none</li>"
         unused = "".join("<li><code>%s</code></li>" % htmllib.escape(sel) for sel, u in rules if not u) or "<li>none</li>"
         pathlib.Path(out).write_text(f"""<!DOCTYPE html><html lang="en"><meta charset="utf-8"><title>Portfolio coverage</title>
 <style>body{{font:14px system-ui;margin:24px;max-width:1100px}}h1{{font-size:20px}}.sum b{{font-size:17px}}
 pre{{background:#f6f8fa;padding:12px;border-radius:8px;overflow:auto}}pre div{{white-space:pre}}
 pre span{{display:inline-block;width:1.6em;color:#888}}.hit{{background:#e6ffec}}.miss{{background:#ffebe9}}.gap{{height:10px}}</style>
 <h1>Portfolio coverage: tests/check_site.py</h1>
-<p class="sum"><b>JavaScript: {hit} of {len(code)} lines ran ({js_pct:.1f}%)</b> · <b>CSS: {used} of {len(rules)} rules used ({css_pct:.1f}%)</b></p>
-<p>Merged across every scenario the check drives: desktop, the system theme changing, the toggle, a reload, a dark system,
-820 and 390 px, print, and reduced motion with Play.</p>
+<p class="sum">{figures} · <b>CSS: {used} of {len(rules)} rules used ({pct(used, len(rules)):.1f}%)</b></p>
+<p>Merged across every scenario the check drives: desktop, the palette and the form by keyboard and mouse, the system
+theme changing, the toggle, a reload, a dark system, 820, 390 and 360 px, print, reduced motion with Play, blocked
+storage with no IntersectionObserver and a clipboard that refuses, and edited content. Branches are the blocks V8 counts
+on their own: each arm of an if/else and of ?:, the right side of &amp;&amp; and ||, a catch, and the code after an early return.</p>
+<h2>Branches and functions never run</h2><ul>{missed}</ul>
 <h2>JavaScript</h2><pre>{listing}</pre><h2>CSS rules never used</h2><ul>{unused}</ul></html>""", encoding="utf-8")
-        print("\nCoverage: JavaScript %d/%d lines (%.1f%%), CSS %d/%d rules (%.1f%%) -> %s" % (hit, len(code), js_pct, used, len(rules), css_pct, out))
+        print("\nCoverage: JavaScript %s; CSS %d/%d rules (%.1f%%) -> %s" % (", ".join(
+            "%s %d/%d (%.1f%%)" % (k, s[k][0], s[k][1], pct(*s[k])) for k in ("lines", "branches", "functions")),
+            used, len(rules), pct(used, len(rules)), out))
         for sel, u in rules:
             if not u: print("  CSS never used: " + sel)
         for ran, line in rows:
             if ran is False: print("  JS never ran:  " + line.strip())
+        for kind, where, text in s["missed"]:
+            print("  JS %s never ran (%s): %s" % (kind, where, text))
 
 
-COV = Coverage() if COVERAGE_OUT else None
+# Always on: the check that every line, branch and function of the page's script ran needs it.
+# --coverage adds the HTML report.
+COV = Coverage()
 
 
-def open_page(browser, **kw):
+def open_page(browser, init=None, **kw):
+    """A fresh context on the page; init is a script run before the page's own (to change its world)."""
     pg = browser.new_context(**kw).new_page()
     pg.errors = []
     pg.on("pageerror", lambda e: pg.errors.append(str(e)))
     pg.on("console", lambda m: pg.errors.append(m.text) if m.type == "error" else None)
-    if COV: COV.attach(pg)
+    if init: pg.add_init_script(init)
+    COV.attach(pg)
     pg.goto(PAGE)
     return pg
 
 
 def reload_page(pg):
-    if COV: COV.snapshot(pg)
+    COV.snapshot(pg)
     pg.reload()
 
 
 def close_page(pg):
     """Closes the page and returns its console errors."""
-    if COV: COV.collect(pg)
+    COV.collect(pg)
     pg.context.close()
     return pg.errors
 
@@ -222,12 +279,75 @@ def check_components(pg):
 
     pg.click("#contactForm button[type=submit]")
     empty = (pg.get_attribute("#cfName", "aria-invalid"), pg.text_content("#formStatus"))
-    pg.fill("#cfName", "Ada"); pg.fill("#cfEmail", "ada@example.com"); pg.fill("#cfMessage", "Hello & welcome")
+    pg.fill("#cfName", "Ada"); pg.fill("#cfEmail", "ada@example"); pg.fill("#cfMessage", "Hello & welcome")
+    pg.click("#contactForm button[type=submit]")
+    partial = (pg.text_content("#formStatus"), pg.evaluate("document.activeElement.id"), pg.get_attribute("#cfName", "aria-invalid"))
+    pg.fill("#cfEmail", "ada@example.com")
     pg.click("#contactForm button[type=submit]"); pg.wait_for_timeout(300)
     mailto = pg.evaluate("document.getElementById('contactForm').dataset.mailto || ''")
     check("the contact form refuses to send empty, and marks what's missing", empty[0] == "true" and "fill in" in empty[1], empty)
+    check("an email address with no domain is named as the problem, and focused",
+          partial == ("That email address looks incomplete.", "cfEmail", "false"), partial)
     check("a filled-in form becomes an email to Luke with the message in it",
           mailto.startswith("mailto:zhang.l17@northeastern.edu?subject=Portfolio%3A%20message%20from%20Ada") and "Hello%20%26%20welcome" in mailto, mailto[:90])
+
+
+def check_palette(pg):
+    """The palette by mouse, its edge cases, and the commands that change the theme or leave the page."""
+    is_open = lambda: pg.evaluate("document.getElementById('palette').open")
+    selected = lambda: pg.evaluate("document.querySelector('#paletteList [aria-selected=\"true\"]').id")
+    command = lambda query: (pg.keyboard.press("Control+k"), pg.keyboard.type(query), pg.keyboard.press("Enter"))
+
+    pg.keyboard.press("Control+k"); pg.keyboard.press("Control+k")
+    toggled = not is_open()
+    pg.click("#paletteBtn"); pg.keyboard.type("pro")
+    by_button = is_open()
+    pg.evaluate("document.getElementById('paletteBtn').click()")   # asked to open while open: nothing restarts
+    kept = pg.input_value("#paletteInput")
+    check("Ctrl+K again closes the palette, the header button opens it, and opening it twice keeps what was typed",
+          toggled and by_button and kept == "pro", (toggled, by_button, kept))
+
+    pg.fill("#paletteInput", "")
+    last = "cmd-%d" % (pg.locator("#paletteList li").count() - 1)
+    pg.keyboard.press("ArrowUp")
+    check("ArrowUp from the first command wraps round to the last", selected() == last, (selected(), last))
+
+    pg.fill("#paletteInput", "zzzz")
+    nothing = pg.evaluate("""[!document.getElementById('paletteEmpty').hidden, document.getElementById('paletteInput').hasAttribute('aria-activedescendant'),
+                              document.querySelectorAll('#paletteList li').length]""")
+    pg.keyboard.press("Enter")
+    check("a search that matches nothing says so, and Enter then does nothing", nothing == [True, False, 0] and is_open(), nothing)
+
+    pg.fill("#paletteInput", "")
+    pg.click("#paletteInput"); pg.click("#paletteList", position={"x": 2, "y": 2})   # the list's padding, between items
+    inside = is_open()
+    pg.mouse.click(4, 4)   # the backdrop
+    check("clicks inside the palette leave it open, and a click on the backdrop closes it", inside and not is_open(), inside)
+
+    pg.click('.chip[data-filter="Computer vision"]')
+    pg.keyboard.press("Control+k"); pg.keyboard.type("tally")
+    pg.locator("#paletteList li").first.click(); pg.wait_for_timeout(1500)
+    tally = pg.evaluate("""[document.querySelectorAll('.project:not([hidden])').length,
+                            (r => r.top < innerHeight && r.bottom > 0)(document.getElementById('tally').getBoundingClientRect())]""")
+    check("clicking a project in the palette clears the filter and goes to its card", tally == [DEMOS, True] and not is_open(), tally)
+
+    theme = lambda: pg.evaluate("document.documentElement.dataset.theme")
+    start, flips = theme(), []
+    for _ in range(2):
+        command("switch theme"); flips.append(theme())
+    check("the palette's Switch theme command switches the theme, and back", flips == [{"dark": "light", "light": "dark"}[start], start], (start, flips))
+
+    # The commands that leave the page: each destination answers 204, which keeps this page where it is.
+    wanted = pg.evaluate("""({'open the tally demo': PROJECTS.find(p => p.id === 'tally').demo,
+                              'open github': PROFILE.links.find(l => l.label === 'GitHub').url,
+                              'open linkedin': PROFILE.links.find(l => l.label === 'LinkedIn').url})""")
+    asked = []
+    leaving = lambda url: url in wanted.values()
+    pg.route(leaving, lambda route: (asked.append(route.request.url), route.fulfill(status=204)))
+    for query in wanted:
+        command(query); pg.wait_for_timeout(400)
+    pg.unroute(leaving)
+    check("the palette's demo, GitHub and LinkedIn commands go to those pages", asked == list(wanted.values()) and pg.url == PAGE, asked)
 
 
 def contrast_failures(pg):
@@ -287,6 +407,12 @@ def check_nav(pg):
     scroll_to(pg, 0); top = current()
     pg.mouse.wheel(0, 20000); settle(); bottom = current()
     check("scrolling marks Contact at the foot of the page, and nothing at the top", bottom == "contact" and top == "", (top, bottom))
+    # Two scroll events inside one frame: the nav is worked out once, on the next frame, not twice.
+    frames = pg.evaluate("""() => { const raf = window.requestAnimationFrame; let n = 0;
+        window.requestAnimationFrame = f => { n++; return raf.call(window, f); };
+        try { dispatchEvent(new Event('scroll')); dispatchEvent(new Event('scroll')); } finally { window.requestAnimationFrame = raf; }
+        return n; }""")
+    check("scroll events within one frame update the nav once", frames == 1, "%s frames asked for" % frames)
 
 
 def check_meta(pg):
@@ -319,6 +445,9 @@ def check_theme(browser):
     check("light mode: all text meets WCAG AA contrast", not light_fail, light_fail[:4])
     reload_page(pg)
     check("a choice of light is remembered after a reload", theme() == "light")
+    pg.click("#themeBtn"); pg.wait_for_timeout(400)
+    check("the button switches back to dark, and remembers that too",
+          theme() == "dark" and pg.evaluate("localStorage.getItem('theme')") == "dark" and toolbar() == "#0B1220", toolbar())
     if SHOTS:
         scroll_to(pg, "document.getElementById('projects').getBoundingClientRect().top + scrollY"); pg.wait_for_timeout(1200)
         pg.screenshot(path=SHOTS + "/pf-dark.png")
@@ -377,7 +506,64 @@ def check_motion(browser):
     rm.locator(".play").first.click(); rm.wait_for_timeout(800)
     check("reduced motion: Play shows that demo",
           rm.evaluate("document.querySelector('.shot img').currentSrc.endsWith('.gif') && !document.querySelector('.shot img').hidden"))
+    rm.keyboard.press("Control+k"); rm.keyboard.type("skills"); rm.keyboard.press("Enter"); rm.wait_for_timeout(100)
+    check("reduced motion: the palette jumps to a section at once, with no smooth scroll",
+          rm.evaluate("Math.abs(document.getElementById('skills').getBoundingClientRect().top) < 120"))
     return close_page(rm)
+
+
+# Storage that throws (a private window, blocked site data), a browser with no IntersectionObserver,
+# and a clipboard that refuses the write.
+BLOCKED = """
+for (const m of ['getItem', 'setItem']) Storage.prototype[m] = function () { throw new DOMException('blocked', 'SecurityError'); };
+delete window.IntersectionObserver;
+Object.defineProperty(navigator, 'clipboard', { value: { writeText: () => Promise.reject(new Error('refused')) } });
+"""
+
+
+def check_fallbacks(browser):
+    f = open_page(browser, init=BLOCKED, viewport={"width": 1280, "height": 900})
+    theme = lambda: f.evaluate("document.documentElement.dataset.theme")
+    check("without IntersectionObserver every section is simply shown, with no scrolling",
+          f.evaluate("[...document.querySelectorAll('.reveal')].every(e => e.classList.contains('in'))"))
+    opened = theme()
+    f.click("#themeBtn"); switched = theme()
+    reload_page(f)
+    check("with storage blocked the page opens dark, the button still switches, and a reload is dark again",
+          (opened, switched, theme()) == ("dark", "light", "dark"), (opened, switched, theme()))
+    f.keyboard.press("Control+k"); f.keyboard.type("copy my email"); f.keyboard.press("Enter"); f.wait_for_timeout(200)
+    status = f.text_content("#formStatus")
+    check("Copy my email address still answers when the clipboard refuses", "Copied zhang.l17@northeastern.edu" in status, status)
+    return close_page(f)
+
+
+# The content arrays edited before the page renders: no photo, no status, the LinkedIn link
+# removed, and one project with no test count, no commit count and no live demo.
+EDITED = """
+const trap = (name, edit) => { let v; Object.defineProperty(window, name, { configurable: true, get: () => v, set: x => { v = edit(x); } }); };
+trap('PROFILE', p => Object.assign(p, { photo: '', status: '', links: p.links.filter(l => l.label !== 'LinkedIn') }));
+trap('PROJECTS', ps => ps.map(p => p.id !== 'tally' ? p : Object.assign(p, {
+  demo: '', commits: undefined, impact: p.impact.map(i => ({ html: i.html.replace(' data-tests', '') })) })));
+"""
+
+
+def check_edited_content(browser):
+    e = open_page(browser, init=EDITED, viewport={"width": 1280, "height": 900})
+    v = e.evaluate("""({avatar: document.getElementById('avatar').textContent, photo: !!document.querySelector('#avatar img'),
+        status: !!document.querySelector('#who .open'), linkedin: !!document.querySelector('a[href*="linkedin.com"]'),
+        first: document.querySelector('#stats span').textContent,
+        total: +document.querySelector('[data-tests-total]').textContent.replace(/,/g, ''),
+        parts: [...document.querySelectorAll('[data-tests]')].map(b => +b.textContent.replace(/,/g, '')),
+        commits: document.querySelector('[data-commits]').textContent,
+        floor: Math.floor(PROJECTS.reduce((n, p) => n + (p.commits || 0), 0) / 10) * 10})""")
+    e.keyboard.press("Control+k"); e.keyboard.type("open ")
+    links = e.evaluate("[...document.querySelectorAll('#paletteList li')].map(li => li.firstChild.textContent).filter(t => /^Open (GitHub|LinkedIn)$/.test(t))")
+    check("edited content: no photo shows the initials, no status shows none, and a removed link takes its command with it",
+          (v["avatar"], v["photo"], v["status"], v["linkedin"], links) == ("LZ", False, False, False, ["Open GitHub"]), (v, links))
+    check("edited content: a project with no test or commit count adds nothing to the totals, and one with no demo drops the live-demos claim",
+          len(v["parts"]) == DEMOS - 1 and v["total"] == sum(v["parts"]) and v["commits"] == "{:,}+".format(v["floor"])
+          and v["first"] == "open-source projects", v)
+    return close_page(e)
 
 
 def fetch(api, url):
@@ -462,6 +648,7 @@ with sync_playwright() as pw:
     pg = open_page(browser, viewport={"width": WIDTHS[0], "height": 900}, color_scheme="light")
     check_structure(pg)
     check_components(pg)
+    check_palette(pg)
     check_demos(pg)
     check_nav(pg)
     check_meta(pg)
@@ -477,7 +664,12 @@ with sync_playwright() as pw:
     errors += check_theme(browser)
     errors += check_layout(browser)
     errors += check_motion(browser)
+    errors += check_fallbacks(browser)
+    errors += check_edited_content(browser)
     check("no errors in the console, in any scenario", not errors, errors[:3])
+    full, cov = COV.complete()
+    check("every line, branch and function of the page's own JavaScript ran (%s)" % ", ".join(
+          "%d/%d %s" % (cov[k][0], cov[k][1], k) for k in ("lines", "branches", "functions")), full, cov["missed"][:4])
     if not OFFLINE:
         api = pw.request.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0) portfolio-link-check")
         check_valid_html(api)
@@ -492,7 +684,7 @@ stated = re.search(r"# (\d+) checks in a real browser", (ROOT / "README.md").rea
 actual = len(results) + 1 + (NETWORK_CHECKS if OFFLINE else 0)
 check("the README's count of checks is right (%d)" % actual, stated and int(stated.group(1)) == actual, stated and stated.group(1))
 
-if COV: COV.report(COVERAGE_OUT)
+if COVERAGE_OUT: COV.report(COVERAGE_OUT)
 failed = sum(not ok for _, ok in results)
 print("%d passed, %d failed" % (len(results) - failed, failed))
 sys.exit(1 if failed else 0)

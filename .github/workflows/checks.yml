@@ -18,10 +18,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Browser checks (structure, demos, layout, dark mode, links, privacy)
+      - run: pip install -r requirements.txt
+      # tools/ against stand-ins for Playwright and Pillow; .coveragerc's fail_under
+      # makes `coverage report` exit 1 below 100% of lines and branches.
+      - name: Python tests, 100% line and branch coverage
+        run: |
+          python -m coverage run -m pytest -q tests
+          python -m coverage report
+      # Exits 1 on any failed check. One of them fails unless every line, branch and
+      # function of the page's own JavaScript ran; --coverage adds the report below.
+      - name: Browser checks (structure, demos, layout, dark mode, links, privacy, JS coverage)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # the commits check reads the GitHub API
         run: |
-          pip install -r requirements.txt
           python -m playwright install --with-deps chromium
-          python tests/check_site.py
+          python tests/check_site.py --coverage coverage.html
+      - name: Keep the JavaScript coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: js-coverage
+          path: coverage.html
+          if-no-files-found: ignore

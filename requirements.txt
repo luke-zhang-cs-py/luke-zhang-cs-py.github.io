@@ -2,3 +2,4 @@
 playwright
 pillow
 coverage
+pytest

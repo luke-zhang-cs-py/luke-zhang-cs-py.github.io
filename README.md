@@ -44,8 +44,9 @@ filter chips from the projects' categories, and the headline test total is added
 
 ```bash
 pip install -r requirements.txt && python -m playwright install chromium
-python tests/check_site.py        # 52 checks in a real browser (--offline skips the 4 that need the network)
-python tests/check_site.py --coverage coverage.html   # plus which lines of JS and CSS rules ran
+python tests/check_site.py        # 69 checks in a real browser (--offline skips the 4 that need the network)
+python tests/check_site.py --coverage coverage.html   # plus a report of which lines and branches of JS and CSS rules ran
+python -m coverage run -m pytest -q tests && python -m coverage report   # the tools' Python: 100% of lines and branches
 python tools/record_demo.py       # re-record docs/demo.gif from the live site
 python tools/make_og.py           # re-render og.png, the link-preview image
 ```
@@ -58,14 +59,20 @@ python tools/make_og.py           # re-render og.png, the link-preview image
 - reduced motion;
 - the link-preview tags;
 - the nav following the scroll and the links clicked;
-- the featured case study, the category filter, the command palette by keyboard, and the contact form;
+- the featured case study, the category filter, the command palette by keyboard and mouse, and the contact form;
+- blocked storage, no IntersectionObserver, a clipboard that refuses, and content edited down (no photo, a link or a figure missing);
 - WCAG AA contrast for every piece of text, in dark and light;
 - print;
 - that the figures on the page add up, and each appears in its project's own README;
 - that the W3C validator finds no errors;
-- that every outbound link answers.
+- that every outbound link answers;
+- that every line, branch and function of the page's own JavaScript ran in those scenarios (V8 block coverage).
 
-It also guards privacy: it fails if the phone number from the resume appears anywhere in the site. The number itself is stored only as a hash.
+It also guards privacy: it fails if the phone number from the resume appears anywhere in the site. The site publishes no phone
+number, so it fails on any phone-shaped string, and prints only how many it found.
+
+`tests/test_tools.py` runs `tools/record_demo.py` and `tools/make_og.py` against stand-ins for Playwright and Pillow, so no
+browser starts; CI fails below 100% of their lines and branches.
 
 ## Layout
 
@@ -76,7 +83,7 @@ og.png            1200×630 link preview (from tools/og.html)
 headshot.jpg      the photo in the introduction
 favicon.svg
 docs/demo.gif     the recording above
-tests/            the browser check (check_site.py; its Python needs are in requirements.txt)
+tests/            the browser check (check_site.py) and the tools' tests (test_tools.py); Python needs in requirements.txt
 tools/            the demo recorder and the preview renderer
 notes/            the code audit
 .github/          the checks workflow
