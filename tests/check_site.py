@@ -13,7 +13,7 @@ Every scenario runs under V8 block coverage, and one check fails unless every li
 function of the page's own JavaScript ran in at least one of them. --coverage also writes an
 HTML report of which lines and branches ran and which CSS rules were used (Chrome's rule usage).
 """
-import html as htmllib, json, os, pathlib, re, sys
+import base64, html as htmllib, json, os, pathlib, re, sys
 from PIL import Image
 from playwright.sync_api import sync_playwright
 
@@ -194,9 +194,12 @@ on their own: each arm of an if/else and of ?:, the right side of &amp;&amp; and
 COV = Coverage()
 
 
-def open_page(browser, init=None, **kw):
-    """A fresh context on the page; init is a script run before the page's own (to change its world)."""
-    pg = browser.new_context(**kw).new_page()
+def open_page(browser, init=None, offsite=None, **kw):
+    """A fresh context on the page; init is a script run before the page's own (to change its world),
+    and offsite, if given, handles every request that isn't for a local file."""
+    context = browser.new_context(**kw)
+    if offsite: context.route(lambda url: not url.startswith("file:"), offsite)
+    pg = context.new_page()
     pg.errors = []
     pg.on("pageerror", lambda e: pg.errors.append(str(e)))
     pg.on("console", lambda m: pg.errors.append(m.text) if m.type == "error" else None)
@@ -337,17 +340,44 @@ def check_palette(pg):
         command("switch theme"); flips.append(theme())
     check("the palette's Switch theme command switches the theme, and back", flips == [{"dark": "light", "light": "dark"}[start], start], (start, flips))
 
-    # The commands that leave the page: each destination answers 204, which keeps this page where it is.
-    wanted = pg.evaluate("""({'open the tally demo': PROJECTS.find(p => p.id === 'tally').demo,
-                              'open github': PROFILE.links.find(l => l.label === 'GitHub').url,
-                              'open linkedin': PROFILE.links.find(l => l.label === 'LinkedIn').url})""")
-    asked = []
-    leaving = lambda url: url in wanted.values()
-    pg.route(leaving, lambda route: (asked.append(route.request.url), route.fulfill(status=204)))
-    for query in wanted:
-        command(query); pg.wait_for_timeout(400)
-    pg.unroute(leaving)
-    check("the palette's demo, GitHub and LinkedIn commands go to those pages", asked == list(wanted.values()) and pg.url == PAGE, asked)
+
+def check_leaving(browser):
+    """The palette commands that leave the page, each in a context of its own that is closed after.
+
+    Nothing reaches the network. The navigation a command starts is recorded and cancelled
+    (net::ERR_ABORTED, which Chromium treats as a navigation that never happened on every
+    platform), so the page stays put with its coverage readable, and nothing is left pending:
+    the nav link is clicked afterwards with a short timeout to prove it. The demo GIFs the page
+    asks for get a blank 1x1 GIF, so no failed load reaches the console."""
+    errors, asked = [], []
+    for query, target in (("open the tally demo", "PROJECTS.find(p => p.id === 'tally').demo"),
+                          ("open github", "PROFILE.links.find(l => l.label === 'GitHub').url"),
+                          ("open linkedin", "PROFILE.links.find(l => l.label === 'LinkedIn').url")):
+        went = []
+        def offsite(route):
+            if route.request.is_navigation_request():
+                went.append(route.request.url); route.abort("aborted")
+            else:
+                route.fulfill(status=200, content_type="image/gif", body=BLANK_GIF)
+        pg = open_page(browser, offsite=offsite, viewport={"width": 1280, "height": 900})
+        wanted = pg.evaluate(target)
+        pg.keyboard.press("Control+k"); pg.keyboard.type(query); pg.keyboard.press("Enter")
+        for _ in range(50):
+            if went: break
+            pg.wait_for_timeout(100)
+        stayed = pg.url == PAGE and pg.evaluate("typeof PROJECTS") == "object"
+        try:
+            pg.click('.bar nav a[href="#about"]', timeout=5000); free = True
+        except Exception as e:   # a navigation still pending would hold this click
+            free = str(e).split("\n")[0][:80]
+        asked.append((wanted, went, stayed, free))
+        errors += close_page(pg)
+    check("the palette's demo, GitHub and LinkedIn commands go to those pages, and the page is free after",
+          all(went == [wanted] and stayed and free is True for wanted, went, stayed, free in asked), asked)
+    return errors
+
+
+BLANK_GIF = base64.b64decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")   # the page's own STILL
 
 
 def contrast_failures(pg):
@@ -664,6 +694,7 @@ with sync_playwright() as pw:
     errors += check_theme(browser)
     errors += check_layout(browser)
     errors += check_motion(browser)
+    errors += check_leaving(browser)
     errors += check_fallbacks(browser)
     errors += check_edited_content(browser)
     check("no errors in the console, in any scenario", not errors, errors[:3])
