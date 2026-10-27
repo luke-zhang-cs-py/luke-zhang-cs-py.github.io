@@ -685,10 +685,15 @@ with sync_playwright() as pw:
     if SHOTS:
         scroll_to(pg, 0); pg.screenshot(path=SHOTS + "/pf-light.png")
     links = sorted(set(pg.evaluate("[...document.querySelectorAll('a[href^=\"http\"]')].map(a => a.href)")))
-    # a figure the page derives (a sum of several README numbers) carries data-derived and is skipped
+    # a figure the page derives (a sum of several README numbers) carries data-derived and is skipped;
+    # a number in the results row outside any <b> (Almanac's "of 2,733 statements") is checked too,
+    # but not the 1 of "F1"
     cards = pg.evaluate("""[...document.querySelectorAll('.project')].map(p => [
         [...p.querySelectorAll('.links a')].pop().href.split('/')[4],
-        [...p.querySelectorAll('.impact b:not([data-derived])')].map(b => b.textContent)])""")
+        [...p.querySelectorAll('.impact b:not([data-derived])')].map(b => b.textContent).concat(
+            [...p.querySelectorAll('.impact li')].flatMap(li => {
+                const bare = li.cloneNode(true); bare.querySelectorAll('b').forEach(b => b.remove());
+                return bare.textContent.match(/(?<![A-Za-z])\\d(?:[\\d,.]*\\d)?/g) || []; }))])""")
     commits = pg.evaluate("[PROJECTS.map(p => [p.source.split('/').pop(), p.commits || 0]), document.querySelector('[data-commits]').textContent]")
     errors = close_page(pg)
     errors += check_theme(browser)

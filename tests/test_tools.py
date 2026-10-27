@@ -177,11 +177,28 @@ def test_record_walks_the_page_in_dark_mode_and_waits_for_every_gif(fakes):
     whole = [e[1] for e in fakes if e[0] == "evaluate" and re.fullmatch(r"window\.scrollTo\(0, \d+\)", e[1])]
     assert whole == ["window.scrollTo(0, %d)" % y for y in (0, 700, 1400, 2100, 2800)] + ["window.scrollTo(0, 0)"]
     assert any(e[0] == "wait_for_function" and e[2] == 90000 for e in fakes)
-    # intro, then about, seven projects, skills and the end: four glide frames each, plus the dwells
-    stops = 1 + 7 + 1 + 1
-    assert len(frames) == 1 + 4 * stops + 1 + 7 * rec.DEMO_FRAMES + 1 + 1
+    # intro, then about, every project, skills and the end: four glide frames each, plus the dwells
+    projects = len(rec.PROJECT_IDS)
+    stops = 1 + projects + 1 + 1
+    assert len(frames) == 1 + 4 * stops + 1 + projects * rec.DEMO_FRAMES + 1 + 1
     assert frames[0][1] == rec.HOLD_MS["intro"] and frames[-1][1] == rec.HOLD_MS["end"]
     assert fakes[-2:] == [("close",), ("stop",)]
+
+
+def test_record_pauses_on_every_card_on_the_page_in_order(fakes):
+    # the cards are PROJECTS in index.html; one missing here is scrolled past with no pause for its demo
+    ids = re.findall(r"^\s+id: '(\w+)'", (ROOT / "index.html").read_text(encoding="utf-8"), re.M)
+    assert load("record_demo").PROJECT_IDS == tuple("#" + i for i in ids)
+
+
+def test_the_gif_wait_is_a_function_so_the_pages_csp_allows_it(fakes):
+    # Playwright evals a bare-expression predicate in the page, and index.html's CSP has no 'unsafe-eval',
+    # so that throws EvalError whenever a GIF is still loading. A function predicate is called, not eval'd.
+    csp = re.search(r'"Content-Security-Policy" content="([^"]*)"', (ROOT / "index.html").read_text(encoding="utf-8"))
+    assert csp and "'unsafe-eval'" not in csp.group(1)
+    load("record_demo").record("https://example.test/")
+    (predicate,) = [e[1] for e in fakes if e[0] == "wait_for_function"]
+    assert predicate.startswith("() => ")
 
 
 def test_save_quantizes_each_frame_and_writes_the_gif(fakes, tmp_path, capsys):

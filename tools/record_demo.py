@@ -16,7 +16,7 @@ DEFAULT_URL = "https://luke-zhang-cs-py.github.io/"
 SIZE = (880, 550)
 HOLD_MS = {"intro": 1600, "section": 1300, "end": 2000}   # how long each still is shown
 DEMO_FRAMES, DEMO_FRAME_MS = 4, 300    # frames captured on each project, so its own demo is seen playing
-PROJECT_IDS = ("#transit", "#almanac", "#chess", "#faces", "#spam", "#wallet", "#tally")
+PROJECT_IDS = ("#transit", "#almanac", "#chess", "#ipo", "#faces", "#spam", "#wallet", "#tally")   # the cards, in page order
 
 
 def parse_args(argv):
@@ -60,7 +60,8 @@ def record(url):
         # let every demo GIF arrive before recording, so none appears half-loaded
         for y in range(0, pg.evaluate("document.body.scrollHeight"), 700):
             pg.evaluate(f"window.scrollTo(0, {y})"); pg.wait_for_timeout(150)
-        pg.wait_for_function("[...document.querySelectorAll('.shot img')].every(i => i.complete && i.naturalWidth)", timeout=90000)
+        # a function, not a bare expression: Playwright evals an expression in the page, which its CSP refuses
+        pg.wait_for_function("() => [...document.querySelectorAll('.shot img')].every(i => i.complete && i.naturalWidth)", timeout=90000)
         pg.evaluate("window.scrollTo(0, 0)"); pg.wait_for_timeout(600)
 
         grab(frames, pg, HOLD_MS["intro"])

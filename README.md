@@ -85,8 +85,10 @@ favicon.svg
 docs/demo.gif     the recording above
 tests/            the browser check (check_site.py) and the tools' tests (test_tools.py); Python needs in requirements.txt
 tools/            the demo recorder and the preview renderer
+ipo-bot/          redirects, so the old /ipo-bot/ and /ipo-bot/app/ links still work
 notes/            the code audit
 .github/          the checks workflow
+.coveragerc       the tools' Python coverage: 100% of lines and branches, or CI fails
 ```
 
 The pages and images stay at the root on purpose: GitHub Pages serves them at those paths, and link previews
