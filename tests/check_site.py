@@ -19,6 +19,8 @@ from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PAGE = (ROOT / "index.html").as_uri()
+# the page's own JavaScript, whose every line, branch and function must run (by URL -> name in the report)
+OWN_SCRIPTS = {(ROOT / f).as_uri(): f for f in ("theme.js", "main.js")}
 SECTIONS = ["about", "projects", "skills", "contact"]
 SKILL_BLOCKS = 8
 WIDTHS = (1280, 820, 390, 360)
@@ -71,7 +73,7 @@ class Coverage:
         self.js = {}         # script source -> covered flag per character
         self.blocks = {}     # script source -> {(start, end)} block ranges V8 reported
         self.funcs = {}      # script source -> {(start, end): name}
-        self.at = {}         # script source -> the index.html line it starts on, less one
+        self.at = {}         # script source -> (its file, the line it starts on, less one)
         self.css = {}        # stylesheet text -> {(start, end): used}
         self.sessions = {}   # page -> (cdp session, {scriptId: (url, first line)})
 
@@ -93,9 +95,9 @@ class Coverage:
         s, scripts = self.sessions[pg] if keep else self.sessions.pop(pg)
         for script in s.send("Profiler.takePreciseCoverage")["result"]:
             url, at = scripts.get(script["scriptId"], (None, 0))
-            if url != PAGE: continue
+            if url not in OWN_SCRIPTS: continue
             src = s.send("Debugger.getScriptSource", {"scriptId": script["scriptId"]})["scriptSource"]
-            self.at[src] = at
+            self.at[src] = (OWN_SCRIPTS[url], at)
             spans = []   # (start, end, ran)
             for f in script["functions"]:
                 rs = [(r["startOffset"], min(r["endOffset"], len(src)), r["count"] > 0) for r in f["ranges"]]
@@ -139,7 +141,8 @@ class Coverage:
             for a, b in sorted(spans):
                 text = src[a:b].split("\n")[0].strip()[:80]
                 name = names.get((a, b)) or ""
-                out.append((any(flags[a:b]), "index.html line %d" % (self.at[src] + src.count("\n", 0, a) + 1), (name + ": " if name else "") + text))
+                file, at = self.at[src]
+                out.append((any(flags[a:b]), "%s line %d" % (file, at + src.count("\n", 0, a) + 1), (name + ": " if name else "") + text))
         return out
 
     def summary(self):
@@ -334,7 +337,7 @@ def check_palette(pg):
                             (r => r.top < innerHeight && r.bottom > 0)(document.getElementById('tally').getBoundingClientRect())]""")
     check("clicking a project in the palette clears the filter and goes to its card", tally == [DEMOS, True] and not is_open(), tally)
 
-    theme = lambda: pg.evaluate("document.documentElement.dataset.theme")
+    theme = lambda: pg.evaluate(THEME_NOW)
     start, flips = theme(), []
     for _ in range(2):
         command("switch theme"); flips.append(theme())
@@ -404,6 +407,75 @@ def contrast_failures(pg):
     }""")
 
 
+# The theme is a class on <html>: theme-dark, theme-light, ...
+THEME_NOW = r"(document.documentElement.className.match(/(?:^|\s)theme-(\S+)/) || [])[1]"
+
+# Every foreground/background pairing the stylesheet uses, by token. Text needs 4.5:1 (WCAG 1.4.3); form-field
+# edges and the focus ring need 3:1 (1.4.11). Checked from the tokens rather than the rendered page, so pairs that
+# only show up in a state the DOM scan never sees (the palette's selected row, an error) are covered too.
+TEXT_PAIRS = [(f, b) for f in ("text-primary", "text-muted", "text-subtle", "accent")
+              for b in ("bg", "surface", "surface-subtle", "accent-subtle")]
+TEXT_PAIRS += [("text-on-accent", "accent"), ("text-on-accent", "accent-hover"), ("danger", "surface"), ("danger", "bg")]
+UI_PAIRS = [("border-strong", "bg"), ("border-strong", "surface"), ("accent", "bg"), ("accent", "surface"), ("danger", "bg")]
+
+
+def theme_blocks():
+    """{theme name: set of tokens its .theme-<name> block sets}, read from tokens.css."""
+    css = (ROOT / "tokens.css").read_text(encoding="utf-8")
+    return {m.group(1): set(re.findall(r"(--[\w-]+)\s*:", m.group(2)))
+            for m in re.finditer(r"\.theme-([a-z]+)\s*\{([^}]*)\}", css)}
+
+
+def token_contrast(pg, name):
+    """Puts theme `name` on <html> and returns the pairings that fall short, as 'fg/bg ratio'."""
+    return pg.evaluate(r"""([name, text, ui]) => {
+      const root = document.documentElement;
+      root.className = root.className.replace(/(^|\s)theme-\S+/g, '').trim() + ' theme-' + name;
+      const probe = document.createElement('i'); document.body.append(probe);
+      const rgb = token => { probe.style.color = 'var(--color-' + token + ')';
+                             return getComputedStyle(probe).color.match(/[\d.]+/g).slice(0, 3).map(v => v / 255); };
+      const lum = c => { const [r, g, b] = c.map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+                         return .2126 * r + .7152 * g + .0722 * b; };
+      const short = [];
+      for (const [pairs, need] of [[text, 4.5], [ui, 3]]) for (const [f, b] of pairs) {
+        const [L1, L2] = [lum(rgb(f)), lum(rgb(b))].sort((x, y) => y - x);
+        const r = (L1 + .05) / (L2 + .05);
+        if (r < need) short.push(f + '/' + b + ' ' + r.toFixed(2));
+      }
+      probe.remove();
+      return short;
+    }""", [name, TEXT_PAIRS, UI_PAIRS])
+
+
+def check_tokens(browser):
+    """Each theme the toggle offers has a complete block in the stylesheet, and every pairing in it meets AA."""
+    pg = open_page(browser, viewport={"width": 1280, "height": 900})
+    themes, blocks = pg.evaluate("THEMES"), theme_blocks()
+    first = blocks.get(themes[0], set())
+    check("every theme in THEMES has a .theme-<name> block setting the same tokens as the default (%s)" % ", ".join(themes),
+          all(t in blocks and blocks[t] == first for t in themes) and len(first) > 10,
+          {t: sorted(blocks.get(t, set()) ^ first) for t in themes})
+    short = {t: token_contrast(pg, t) for t in themes}
+    check("every foreground/background token pairing meets WCAG AA in every theme", not any(short.values()), short)
+    return close_page(pg)
+
+
+def check_no_js(browser):
+    """JavaScript off: the class in the markup themes the page on its own."""
+    context = browser.new_context(java_script_enabled=False, color_scheme="light", viewport={"width": 1280, "height": 900})
+    pg = context.new_page()
+    pg.goto(PAGE)
+    seen = pg.evaluate("""[document.documentElement.className, getComputedStyle(document.body).backgroundColor,
+        getComputedStyle(document.documentElement).colorScheme,
+        [...document.querySelectorAll('#themeBtn svg')].map(s => getComputedStyle(s).display).join()]""")
+    check("with JavaScript off the page is still themed dark: the class, background, colour-scheme and toggle icon",
+          seen == ["theme-dark", "rgb(11, 18, 32)", "dark", "none,block"], seen)   # svg in a flex box: block
+    fail = contrast_failures(pg)
+    check("with JavaScript off, the text that's there meets WCAG AA contrast", not fail, fail[:4])
+    context.close()
+    return []
+
+
 def check_demos(pg):
     for y in range(0, pg.evaluate("document.body.scrollHeight"), 500):
         scroll_to(pg, y)
@@ -458,7 +530,7 @@ def check_meta(pg):
 
 def check_theme(browser):
     pg = open_page(browser, viewport={"width": 1280, "height": 900}, color_scheme="light")
-    theme = lambda: pg.evaluate("document.documentElement.dataset.theme")
+    theme = lambda: pg.evaluate(THEME_NOW)
     toolbar = lambda: pg.evaluate("[...document.querySelectorAll('meta[name=\"theme-color\"]')].map(m => m.content).join()")
     check("the page opens in dark mode, even on a system set to light", theme() == "dark")
     pg.evaluate("document.querySelectorAll('.reveal').forEach(e => e.classList.add('in'))"); pg.wait_for_timeout(700)
@@ -483,8 +555,15 @@ def check_theme(browser):
         pg.screenshot(path=SHOTS + "/pf-dark.png")
     errors = close_page(pg)
     d = open_page(browser, viewport={"width": 1280, "height": 900}, color_scheme="dark")
-    check("a visitor whose system is dark gets dark mode too", d.evaluate("document.documentElement.dataset.theme") == "dark")
-    return errors + close_page(d)
+    check("a visitor whose system is dark gets dark mode too", d.evaluate(THEME_NOW) == "dark")
+    errors += close_page(d)
+    # a theme saved by an older version of the site, since removed
+    s = open_page(browser, init="localStorage.setItem('theme', 'sepia')", viewport={"width": 1280, "height": 900})
+    seen = s.evaluate("[document.documentElement.className.match(/theme-\\S+/g).join(), getComputedStyle(document.body).backgroundColor, "
+                      "document.getElementById('themeBtn').getAttribute('aria-label')]")
+    check("a saved theme that no longer exists opens dark instead, with the button offering light",
+          seen == ["theme-dark", "rgb(11, 18, 32)", "Switch to light theme"], seen)
+    return errors + close_page(s)
 
 
 def check_layout(browser):
@@ -553,7 +632,7 @@ Object.defineProperty(navigator, 'clipboard', { value: { writeText: () => Promis
 
 def check_fallbacks(browser):
     f = open_page(browser, init=BLOCKED, viewport={"width": 1280, "height": 900})
-    theme = lambda: f.evaluate("document.documentElement.dataset.theme")
+    theme = lambda: f.evaluate(THEME_NOW)
     check("without IntersectionObserver every section is simply shown, with no scrolling",
           f.evaluate("[...document.querySelectorAll('.reveal')].every(e => e.classList.contains('in'))"))
     opened = theme()
@@ -697,6 +776,8 @@ with sync_playwright() as pw:
     commits = pg.evaluate("[PROJECTS.map(p => [p.source.split('/').pop(), p.commits || 0]), document.querySelector('[data-commits]').textContent]")
     errors = close_page(pg)
     errors += check_theme(browser)
+    errors += check_tokens(browser)
+    errors += check_no_js(browser)
     errors += check_layout(browser)
     errors += check_motion(browser)
     errors += check_leaving(browser)

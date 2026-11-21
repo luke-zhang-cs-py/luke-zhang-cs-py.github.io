@@ -186,8 +186,8 @@ def test_record_walks_the_page_in_dark_mode_and_waits_for_every_gif(fakes):
 
 
 def test_record_pauses_on_every_card_on_the_page_in_order(fakes):
-    # the cards are PROJECTS in index.html; one missing here is scrolled past with no pause for its demo
-    ids = re.findall(r"^\s+id: '(\w+)'", (ROOT / "index.html").read_text(encoding="utf-8"), re.M)
+    # the cards are PROJECTS in main.js; one missing here is scrolled past with no pause for its demo
+    ids = re.findall(r"^\s+id: '(\w+)'", (ROOT / "main.js").read_text(encoding="utf-8"), re.M)
     assert load("record_demo").PROJECT_IDS == tuple("#" + i for i in ids)
 
 

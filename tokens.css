@@ -1,0 +1,90 @@
+/* tokens.css -- design tokens for luke-zhang-cs-py.github.io. Load before styles.css. */
+
+/* ======================================================================
+   DESIGN TOKENS
+   1. Theme-independent tokens (spacing, type, shape, motion) live on :root.
+   2. Colour tokens live in one block per theme, keyed on a class on <html>.
+      The class is in the markup, so the page is themed with no JavaScript.
+   3. Components (styles.css) read semantic tokens only, never a raw colour.
+   To add a theme: copy a theme block, rename it .theme-<name>, set every
+   token in it, and add <name> to THEMES in main.js. Nothing else changes,
+   and tests/check_site.py checks the new theme's pairings for WCAG AA.
+   ====================================================================== */
+:root{
+  /* spacing: --space-N is N x 4px, so a step can be added without renaming the rest */
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px; --space-6:24px; --space-7:28px;
+  --space-8:32px; --space-9:36px; --space-10:40px; --space-12:48px; --space-14:56px; --space-16:64px; --space-24:96px; --space-28:112px;
+  /* fluid layout spacing, built from the scale: each grows with the viewport between two steps */
+  --space-gutter:clamp(var(--space-4),4vw,var(--space-8));
+  --space-section:clamp(var(--space-14),9vw,var(--space-24));
+  --space-gap-s:clamp(var(--space-2),1.2vw,var(--space-3));
+  --space-gap-m:clamp(var(--space-3),2vw,var(--space-6));
+  --space-gap-l:clamp(var(--space-6),4vw,var(--space-12));
+  --space-card:clamp(var(--space-4),2.4vw,var(--space-6));
+
+  /* typography */
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Consolas,monospace;
+  --text-2xs:.76rem;
+  --text-xs:.8rem;
+  --text-sm:.86rem;
+  --text-md:.93rem;
+  --text-lg:1.15rem;
+  --text-body:clamp(15px,.9rem + .2vw,17px);
+  --text-xl:clamp(1.08rem,.95rem + .7vw,1.38rem);
+  --text-2xl:clamp(1.3rem,1.1rem + 1vw,1.7rem);
+  --text-3xl:clamp(1.6rem,1.2rem + 2vw,2.3rem);
+  --text-4xl:clamp(2.5rem,1.4rem + 5.4vw,4.6rem);
+  --leading-display:1.02; --leading-tight:1.15; --leading-snug:1.4; --leading-body:1.65; --leading-relaxed:1.7;
+  --weight-semibold:600; --weight-bold:700;
+  --tracking-display:-.035em; --tracking-tight:-.02em; --tracking-snug:-.01em; --tracking-caps:.06em;
+
+  /* shape and motion */
+  --radius-xs:6px; --radius-sm:8px; --radius-md:10px; --radius-lg:14px; --radius-xl:18px; --radius-2xl:20px; --radius-full:999px;
+  --bar-h:60px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --duration-fast:.2s; --duration:.3s; --duration-slow:.6s;
+}
+
+/* ---- themes. :where(:root) has no specificity, so it is only the fallback for an
+   <html> carrying no theme class or an unknown one; any .theme-* block wins over it. */
+:where(:root),.theme-dark{
+  color-scheme:dark;
+  --color-bg:#0B1220;              /* the page behind everything */
+  --color-surface:#111A2E;         /* cards, buttons, dialogs */
+  --color-surface-subtle:#16213A;  /* demo frames, skill pills, kbd */
+  --color-border:#22304A;          /* separators and card edges */
+  --color-border-strong:#5A6B88;   /* form fields: 3:1 against bg and surface */
+  --color-text-primary:#E2E8F0;
+  --color-text-muted:#A3B1C6;
+  --color-text-subtle:#94A3B8;     /* meta, hints, footer */
+  --color-accent:#2DD4BF;
+  --color-accent-hover:#5EEAD4;
+  --color-accent-subtle:#0F3B3A;   /* tinted backgrounds that carry text */
+  --color-text-on-accent:#042F2E;
+  --color-danger:#F2555A;
+  --color-scrim:rgba(3,7,18,.55);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3),0 16px 36px -18px rgba(0,0,0,.7);
+  --shadow-lg:0 2px 4px rgba(0,0,0,.35),0 26px 48px -20px rgba(0,0,0,.8);
+  --icon-moon:none; --icon-sun:inline;   /* the toggle shows where it will take you */
+}
+.theme-light{
+  color-scheme:light;
+  --color-bg:#F8FAFC;
+  --color-surface:#FFFFFF;
+  --color-surface-subtle:#F1F5F9;
+  --color-border:#E2E8F0;
+  --color-border-strong:#848FA0;
+  --color-text-primary:#0F172A;
+  --color-text-muted:#475569;
+  --color-text-subtle:#5B6B80;
+  --color-accent:#0F766E;
+  --color-accent-hover:#115E59;
+  --color-accent-subtle:#CCFBF1;
+  --color-text-on-accent:#FFFFFF;
+  --color-danger:#B42318;
+  --color-scrim:rgba(3,7,18,.55);
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06),0 12px 32px -16px rgba(15,23,42,.25);
+  --shadow-lg:0 2px 4px rgba(15,23,42,.08),0 22px 44px -18px rgba(15,23,42,.35);
+  --icon-moon:inline; --icon-sun:none;
+}

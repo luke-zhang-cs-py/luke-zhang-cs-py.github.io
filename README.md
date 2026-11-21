@@ -32,11 +32,11 @@ If `github.io` is blocked on your network (some university wifi is), open [`inde
 
 ## Run it
 
-Double-click `index.html`. It's one file of plain HTML, CSS and JavaScript: no build, no framework, no web fonts.
+Double-click `index.html`. It's plain HTML, CSS and JavaScript in four small files beside it: no build, no framework, no web fonts.
 
 ## Change the content
 
-Everything the page shows lives in four arrays at the top of the script in `index.html`: `PROFILE`, `PROJECTS`,
+Everything the page shows lives in four arrays at the top of `main.js`: `PROFILE`, `PROJECTS`,
 `SKILLS`, and the command list built from them. Edit those, not the markup; the sections are rendered from them, the
 filter chips from the projects' categories, and the headline test total is added up from each project's own count.
 
@@ -44,7 +44,7 @@ filter chips from the projects' categories, and the headline test total is added
 
 ```bash
 pip install -r requirements.txt && python -m playwright install chromium
-python tests/check_site.py        # 69 checks in a real browser (--offline skips the 4 that need the network)
+python tests/check_site.py        # 74 checks in a real browser (--offline skips the 4 that need the network)
 python tests/check_site.py --coverage coverage.html   # plus a report of which lines and branches of JS and CSS rules ran
 python -m coverage run -m pytest -q tests && python -m coverage report   # the tools' Python: 100% of lines and branches
 python tools/record_demo.py       # re-record docs/demo.gif from the live site
@@ -55,7 +55,8 @@ python tools/make_og.py           # re-render og.png, the link-preview image
 - every section and project link;
 - that all eight demo GIFs load at their declared sizes;
 - layout at 1280, 820, 390 and 360 px;
-- dark mode and that it's remembered;
+- dark mode and that it's remembered, that the page is themed with JavaScript off, and that a saved theme since removed falls back to dark;
+- that every theme in `THEMES` has a complete token block, and every foreground/background token pairing meets WCAG AA in each;
 - reduced motion;
 - the link-preview tags;
 - the nav following the scroll and the links clicked;
@@ -77,7 +78,11 @@ browser starts; CI fails below 100% of their lines and branches.
 ## Layout
 
 ```
-index.html        the whole site
+index.html        the markup, themed dark by the class on <html> with no JavaScript needed
+tokens.css        design tokens: spacing, type, and one colour block per theme (add a theme here and in THEMES)
+styles.css        the components, which read only the tokens
+theme.js          restores a theme the visitor chose, before first paint
+main.js           the content arrays and the code that renders them
 404.html          GitHub Pages' not-found page
 og.png            1200×630 link preview (from tools/og.html)
 headshot.jpg      the photo in the introduction
