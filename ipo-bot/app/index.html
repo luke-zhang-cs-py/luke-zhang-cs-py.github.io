@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,11 +10,16 @@
 <meta name="robots" content="noindex">
 <meta http-equiv="refresh" content="0; url=https://luke-zhang-cs-py.github.io/IPO-and-Equity-Research-Agent/app/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#181B10">
+<script src="/theme.js"></script>
+<link rel="stylesheet" href="/design/fonts.css">
 <script>location.replace("https://luke-zhang-cs-py.github.io/IPO-and-Equity-Research-Agent/app/" + location.search + location.hash);</script>
 <style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F8FAFC;color:#0F172A;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:center;padding:24px}
-  @media (prefers-color-scheme:dark){ body{background:#0B1220;color:#E2E8F0} }
-  a{color:#0F766E;font-weight:600}
+  /* IPO Research's palette (moss + coral, design/palettes.json), matching the project's own pages */
+  :where(:root),.theme-dark{color-scheme:dark;--color-bg:#181B10;--color-surface:#212419;--color-surface-subtle:#2A2D20;--color-border:#363A2C;--color-border-strong:#6C7160;--color-text-primary:#E7E9E1;--color-text-muted:#B5B9AC;--color-text-subtle:#A2A797;--color-accent:#E29D91;--color-accent-hover:#F4B6AB;--color-accent-subtle:#452B27;--color-text-on-accent:#271512;--color-danger:#DF7F78;}
+  .theme-light{color-scheme:light;--color-bg:#F5F7EF;--color-surface:#FBFCF8;--color-surface-subtle:#EBEEE4;--color-border:#D9DCD1;--color-border-strong:#8A8F7D;--color-text-primary:#25281E;--color-text-muted:#595D4C;--color-text-subtle:#676B5A;--color-accent:#94554B;--color-accent-hover:#794037;--color-accent-subtle:#FBDDD7;--color-text-on-accent:#FFF8F6;--color-danger:#A83634;}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--color-bg);color:var(--color-text-primary);font:16px/1.6 "IBM Plex Sans",sans-serif;text-align:center;padding:24px}
+  a{color:var(--color-accent);font-weight:600}
 </style>
 </head>
 <body>
