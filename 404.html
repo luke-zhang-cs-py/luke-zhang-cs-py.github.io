@@ -1,17 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Not found · Luke Zhang</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#1D1815">
+<!-- Root-relative paths: GitHub Pages serves this page for a missing URL at any depth.
+     Themed dark by the class above; theme.js only restores a light theme chosen on the portfolio. -->
+<script src="/theme.js"></script>
+<link rel="stylesheet" href="/design/fonts.css">
+<link rel="stylesheet" href="/tokens.css">
 <style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F8FAFC;color:#0F172A;font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;text-align:center;padding:24px}
-  @media (prefers-color-scheme:dark){ body{background:#0B1220;color:#E2E8F0} p{color:#A3B1C6} }
-  h1{font-size:3rem;margin:0 0 8px;letter-spacing:-.03em}
-  p{color:#475569;margin:0 0 24px}
-  a{display:inline-block;padding:11px 18px;border-radius:10px;background:#0F766E;color:#fff;font-weight:600;text-decoration:none}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--color-bg);color:var(--color-text-primary);font:var(--text-base)/1.6 var(--font-sans);text-align:center;padding:var(--space-6)}
+  h1{font:var(--weight-display) var(--text-display)/var(--leading-display) var(--font-display);margin:0 0 var(--space-2);letter-spacing:var(--tracking-display)}
+  p{color:var(--color-text-muted);margin:0 0 var(--space-6)}
+  a{display:inline-block;padding:11px 18px;border-radius:10px;background:var(--color-accent);color:var(--color-text-on-accent);font-weight:var(--weight-semibold);text-decoration:none}
+  a:hover{background:var(--color-accent-hover)}
+  a:focus-visible{outline:3px solid var(--color-accent);outline-offset:3px}
 </style>
 </head>
 <body>

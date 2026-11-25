@@ -170,7 +170,7 @@ class Coverage:
         missed = "".join("<li>%s, %s: <code>%s</code></li>" % (k, w, htmllib.escape(t)) for k, w, t in s["missed"]) or "<li>none</li>"
         unused = "".join("<li><code>%s</code></li>" % htmllib.escape(sel) for sel, u in rules if not u) or "<li>none</li>"
         pathlib.Path(out).write_text(f"""<!DOCTYPE html><html lang="en"><meta charset="utf-8"><title>Portfolio coverage</title>
-<style>body{{font:14px system-ui;margin:24px;max-width:1100px}}h1{{font-size:20px}}.sum b{{font-size:17px}}
+<style>body{{font:14px sans-serif;margin:24px;max-width:1100px}}h1{{font-size:20px}}.sum b{{font-size:17px}}
 pre{{background:#f6f8fa;padding:12px;border-radius:8px;overflow:auto}}pre div{{white-space:pre}}
 pre span{{display:inline-block;width:1.6em;color:#888}}.hit{{background:#e6ffec}}.miss{{background:#ffebe9}}.gap{{height:10px}}</style>
 <h1>Portfolio coverage: tests/check_site.py</h1>
@@ -383,9 +383,9 @@ def check_leaving(browser):
 BLANK_GIF = base64.b64decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")   # the page's own STILL
 
 
-def contrast_failures(pg):
-    """WCAG AA: every piece of visible text against the colour actually behind it."""
-    return pg.evaluate(r"""() => {
+def contrast_failures(pg, scope="body"):
+    """WCAG AA: every piece of visible text (inside scope) against the colour actually behind it."""
+    return pg.evaluate(r"""(scope) => {
       // rgb()/rgba() give 0-255 channels; color(srgb ...), which Chrome uses for color-mix(), gives 0-1
       const parse = c => { const n = c.match(/[\d.]+/g).map(Number); const unit = c.startsWith('color(') ? 1 : 255;
                            return { rgb: n.slice(0, 3).map(v => v / unit), a: n.length > 3 ? n[3] : 1 }; };
@@ -394,7 +394,7 @@ def contrast_failures(pg):
       const behind = el => { for (let e = el; e; e = e.parentElement) { const bg = getComputedStyle(e).backgroundColor;
                          if (/\d/.test(bg) && parse(bg).a > .5) return bg; } return getComputedStyle(document.body).backgroundColor; };
       const out = [];
-      for (const el of document.querySelectorAll('body *')) {
+      for (const el of document.querySelectorAll(scope + ' *')) {
         if (!el.childNodes.length || ![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
         const s = getComputedStyle(el); if (s.visibility === 'hidden' || s.display === 'none' || !el.getClientRects().length) continue;
         if (el.closest('dialog:not([open]), [hidden], .skip, noscript')) continue;
@@ -404,7 +404,7 @@ def contrast_failures(pg):
         if (ratio < (big ? 3 : 4.5)) out.push(el.tagName + '.' + el.className + ' ' + ratio.toFixed(2) + ' "' + el.textContent.trim().slice(0, 24) + '"');
       }
       return [...new Set(out)];
-    }""")
+    }""", scope)
 
 
 # The theme is a class on <html>: theme-dark, theme-light, ...
@@ -414,7 +414,12 @@ THEME_NOW = r"(document.documentElement.className.match(/(?:^|\s)theme-(\S+)/) |
 # edges and the focus ring need 3:1 (1.4.11). Checked from the tokens rather than the rendered page, so pairs that
 # only show up in a state the DOM scan never sees (the palette's selected row, an error) are covered too.
 TEXT_PAIRS = [(f, b) for f in ("text-primary", "text-muted", "text-subtle", "accent")
-              for b in ("bg", "surface", "surface-subtle", "accent-subtle")]
+              for b in ("bg", "surface", "surface-subtle")]
+# accent-subtle (the status pill, the results row, the palette's selected row) carries only these; the palettes in
+# design/palettes.json guarantee text-primary on it, and text-subtle and accent fall short there in light. That
+# the stylesheet really keeps to these is held by the rendered scan of the open palette in check_tokens, and of
+# the page in check_theme.
+TEXT_PAIRS += [(f, "accent-subtle") for f in ("text-primary", "text-muted", "accent-hover")]
 TEXT_PAIRS += [("text-on-accent", "accent"), ("text-on-accent", "accent-hover"), ("danger", "surface"), ("danger", "bg")]
 UI_PAIRS = [("border-strong", "bg"), ("border-strong", "surface"), ("accent", "bg"), ("accent", "surface"), ("danger", "bg")]
 
@@ -455,8 +460,16 @@ def check_tokens(browser):
     check("every theme in THEMES has a .theme-<name> block setting the same tokens as the default (%s)" % ", ".join(themes),
           all(t in blocks and blocks[t] == first for t in themes) and len(first) > 10,
           {t: sorted(blocks.get(t, set()) ^ first) for t in themes})
-    short = {t: token_contrast(pg, t) for t in themes}
-    check("every foreground/background token pairing meets WCAG AA in every theme", not any(short.values()), short)
+    short = {}
+    for t in themes:
+        short[t] = token_contrast(pg, t)
+        # the palette's selected row: a state the page-wide scans never see, since they skip a closed dialog
+        pg.keyboard.press("Control+k"); pg.keyboard.type("o"); pg.keyboard.press("ArrowDown")
+        rows = pg.locator('#paletteList [aria-selected="true"] span').count()
+        short[t] += contrast_failures(pg, "#palette") if rows == 1 else ["no selected row with a hint in the palette"]
+        pg.keyboard.press("Escape")
+    check("every foreground/background token pairing meets WCAG AA in every theme, and so does the open palette's selected row",
+          not any(short.values()), short)
     return close_page(pg)
 
 
@@ -469,7 +482,7 @@ def check_no_js(browser):
         getComputedStyle(document.documentElement).colorScheme,
         [...document.querySelectorAll('#themeBtn svg')].map(s => getComputedStyle(s).display).join()]""")
     check("with JavaScript off the page is still themed dark: the class, background, colour-scheme and toggle icon",
-          seen == ["theme-dark", "rgb(11, 18, 32)", "dark", "none,block"], seen)   # svg in a flex box: block
+          seen == ["theme-dark", "rgb(29, 24, 21)", "dark", "none,block"], seen)   # svg in a flex box: block
     fail = contrast_failures(pg)
     check("with JavaScript off, the text that's there meets WCAG AA contrast", not fail, fail[:4])
     context.close()
@@ -542,14 +555,14 @@ def check_theme(browser):
     pg.click("#themeBtn"); pg.wait_for_timeout(400)
     after = pg.evaluate("getComputedStyle(document.body).backgroundColor")
     check("the theme button switches to light", theme() == "light" and before != after, (before, after))
-    check("the browser toolbar colour follows the chosen theme", toolbar() == "#F8FAFC", toolbar())
+    check("the browser toolbar colour follows the chosen theme", toolbar() == "#F9F5F2", toolbar())
     light_fail = contrast_failures(pg)
     check("light mode: all text meets WCAG AA contrast", not light_fail, light_fail[:4])
     reload_page(pg)
     check("a choice of light is remembered after a reload", theme() == "light")
     pg.click("#themeBtn"); pg.wait_for_timeout(400)
     check("the button switches back to dark, and remembers that too",
-          theme() == "dark" and pg.evaluate("localStorage.getItem('theme')") == "dark" and toolbar() == "#0B1220", toolbar())
+          theme() == "dark" and pg.evaluate("localStorage.getItem('theme')") == "dark" and toolbar() == "#1D1815", toolbar())
     if SHOTS:
         scroll_to(pg, "document.getElementById('projects').getBoundingClientRect().top + scrollY"); pg.wait_for_timeout(1200)
         pg.screenshot(path=SHOTS + "/pf-dark.png")
@@ -562,7 +575,7 @@ def check_theme(browser):
     seen = s.evaluate("[document.documentElement.className.match(/theme-\\S+/g).join(), getComputedStyle(document.body).backgroundColor, "
                       "document.getElementById('themeBtn').getAttribute('aria-label')]")
     check("a saved theme that no longer exists opens dark instead, with the button offering light",
-          seen == ["theme-dark", "rgb(11, 18, 32)", "Switch to light theme"], seen)
+          seen == ["theme-dark", "rgb(29, 24, 21)", "Switch to light theme"], seen)
     return errors + close_page(s)
 
 

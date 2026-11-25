@@ -1,7 +1,7 @@
 # Luke Zhang — Software Engineering Portfolio
 
 [![checks](https://github.com/luke-zhang-cs-py/luke-zhang-cs-py.github.io/actions/workflows/checks.yml/badge.svg)](https://github.com/luke-zhang-cs-py/luke-zhang-cs-py.github.io/actions/workflows/checks.yml)
-[![Live site](https://img.shields.io/badge/live-luke--zhang--cs--py.github.io-0F766E.svg)](https://luke-zhang-cs-py.github.io/)
+[![Live site](https://img.shields.io/badge/live-luke--zhang--cs--py.github.io-207663.svg)](https://luke-zhang-cs-py.github.io/)
 [![No build step](https://img.shields.io/badge/HTML%20%2B%20CSS-no%20build%20step-blue.svg)](index.html)
 
 Eight projects in one place, each with a live demo that runs in your browser, what it does, what was measured,
@@ -32,7 +32,7 @@ If `github.io` is blocked on your network (some university wifi is), open [`inde
 
 ## Run it
 
-Double-click `index.html`. It's plain HTML, CSS and JavaScript in four small files beside it: no build, no framework, no web fonts.
+Double-click `index.html`. It's plain HTML, CSS and JavaScript in four small files beside it: no build and no framework. The fonts are self-hosted in `design/`, so nothing loads from anywhere else.
 
 ## Change the content
 
@@ -92,6 +92,8 @@ tests/            the browser check (check_site.py) and the tools' tests (test_t
 tools/            the demo recorder and the preview renderer
 ipo-bot/          redirects, so the old /ipo-bot/ and /ipo-bot/app/ links still work
 notes/            the code audit
+DESIGN.md         the design rules every project page follows: type, colour, space
+design/           fonts.css and fonts/ (Bricolage Grotesque, IBM Plex Sans and Mono, OFL), and palettes.py, which generates every repo's palette into palettes.json
 .github/          the checks workflow
 .coveragerc       the tools' Python coverage: 100% of lines and branches, or CI fails
 ```

@@ -22,21 +22,22 @@
   --space-gap-l:clamp(var(--space-6),4vw,var(--space-12));
   --space-card:clamp(var(--space-4),2.4vw,var(--space-6));
 
-  /* typography */
-  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Consolas,monospace;
-  --text-2xs:.76rem;
-  --text-xs:.8rem;
-  --text-sm:.86rem;
-  --text-md:.93rem;
+  /* typography (DESIGN.md): self-hosted in design/fonts.css. Display is variable but only 200 and 800 are used.
+     A stack ends at the generic family: no system fonts in between. */
+  --font-display:"Bricolage Grotesque",sans-serif;
+  --font-sans:"IBM Plex Sans",sans-serif;
+  --font-mono:"IBM Plex Mono",monospace;
+  /* the scale: each step 3x the one below. sm is mono meta only (counts, labels); base is body copy and controls;
+     xl the section headings; display the one headline per page. lg and 2xl are interim sizes for card titles and
+     figures until the layout pass moves them onto the scale. */
+  --text-sm:13px;
+  --text-base:16px;
   --text-lg:1.15rem;
-  --text-body:clamp(15px,.9rem + .2vw,17px);
-  --text-xl:clamp(1.08rem,.95rem + .7vw,1.38rem);
   --text-2xl:clamp(1.3rem,1.1rem + 1vw,1.7rem);
-  --text-3xl:clamp(1.6rem,1.2rem + 2vw,2.3rem);
-  --text-4xl:clamp(2.5rem,1.4rem + 5.4vw,4.6rem);
+  --text-xl:48px;
+  --text-display:clamp(64px,14vw,144px);
   --leading-display:1.02; --leading-tight:1.15; --leading-snug:1.4; --leading-body:1.65; --leading-relaxed:1.7;
-  --weight-semibold:600; --weight-bold:700;
+  --weight-semibold:600; --weight-display:800; --weight-display-light:200;
   --tracking-display:-.035em; --tracking-tight:-.02em; --tracking-snug:-.01em; --tracking-caps:.06em;
 
   /* shape and motion */
@@ -50,41 +51,41 @@
    <html> carrying no theme class or an unknown one; any .theme-* block wins over it. */
 :where(:root),.theme-dark{
   color-scheme:dark;
-  --color-bg:#0B1220;              /* the page behind everything */
-  --color-surface:#111A2E;         /* cards, buttons, dialogs */
-  --color-surface-subtle:#16213A;  /* demo frames, skill pills, kbd */
-  --color-border:#22304A;          /* separators and card edges */
-  --color-border-strong:#5A6B88;   /* form fields: 3:1 against bg and surface */
-  --color-text-primary:#E2E8F0;
-  --color-text-muted:#A3B1C6;
-  --color-text-subtle:#94A3B8;     /* meta, hints, footer */
-  --color-accent:#2DD4BF;
-  --color-accent-hover:#5EEAD4;
-  --color-accent-subtle:#0F3B3A;   /* tinted backgrounds that carry text */
-  --color-text-on-accent:#042F2E;
-  --color-danger:#F2555A;
-  --color-scrim:rgba(3,7,18,.55);
+  --color-bg:#1D1815;              /* the page behind everything */
+  --color-surface:#27221E;         /* cards, buttons, dialogs */
+  --color-surface-subtle:#302A26;  /* demo frames, skill pills, kbd */
+  --color-border:#3D3732;          /* separators and card edges */
+  --color-border-strong:#756D67;   /* form fields: 3:1 against bg and surface */
+  --color-text-primary:#EBE7E4;
+  --color-text-muted:#BCB6B1;
+  --color-text-subtle:#AAA39D;     /* meta, hints, footer */
+  --color-accent:#73C3AE;
+  --color-accent-hover:#93D8C4;
+  --color-accent-subtle:#1A3A32;   /* tinted backgrounds that carry text */
+  --color-text-on-accent:#091F1A;
+  --color-danger:#DF7F78;
+  --color-scrim:rgba(13,10,8,.6);    /* behind the palette dialog: the bg, darker */
   --shadow-sm:0 1px 2px rgba(0,0,0,.3),0 16px 36px -18px rgba(0,0,0,.7);
   --shadow-lg:0 2px 4px rgba(0,0,0,.35),0 26px 48px -20px rgba(0,0,0,.8);
   --icon-moon:none; --icon-sun:inline;   /* the toggle shows where it will take you */
 }
 .theme-light{
   color-scheme:light;
-  --color-bg:#F8FAFC;
-  --color-surface:#FFFFFF;
-  --color-surface-subtle:#F1F5F9;
-  --color-border:#E2E8F0;
-  --color-border-strong:#848FA0;
-  --color-text-primary:#0F172A;
-  --color-text-muted:#475569;
-  --color-text-subtle:#5B6B80;
-  --color-accent:#0F766E;
-  --color-accent-hover:#115E59;
-  --color-accent-subtle:#CCFBF1;
-  --color-text-on-accent:#FFFFFF;
-  --color-danger:#B42318;
-  --color-scrim:rgba(3,7,18,.55);
-  --shadow-sm:0 1px 2px rgba(15,23,42,.06),0 12px 32px -16px rgba(15,23,42,.25);
-  --shadow-lg:0 2px 4px rgba(15,23,42,.08),0 22px 44px -18px rgba(15,23,42,.35);
+  --color-bg:#F9F5F2;
+  --color-surface:#FDFBFA;
+  --color-surface-subtle:#F1ECE8;
+  --color-border:#DFDAD5;
+  --color-border-strong:#968D87;
+  --color-text-primary:#2A2522;
+  --color-text-muted:#615953;
+  --color-text-subtle:#6F6761;
+  --color-accent:#207663;
+  --color-accent-hover:#096150;
+  --color-accent-subtle:#CEEDE3;
+  --color-text-on-accent:#F4FCFA;
+  --color-danger:#A83634;
+  --color-scrim:rgba(42,37,34,.5);   /* text-primary's stone, so the shade stays warm */
+  --shadow-sm:0 1px 2px rgba(42,37,34,.06),0 12px 32px -16px rgba(42,37,34,.25);
+  --shadow-lg:0 2px 4px rgba(42,37,34,.08),0 22px 44px -18px rgba(42,37,34,.35);
   --icon-moon:inline; --icon-sun:none;
 }
