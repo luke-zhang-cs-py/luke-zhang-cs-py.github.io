@@ -11,16 +11,15 @@
    and tests/check_site.py checks the new theme's pairings for WCAG AA.
    ====================================================================== */
 :root{
-  /* spacing: --space-N is N x 4px, so a step can be added without renaming the rest */
-  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px; --space-6:24px; --space-7:28px;
-  --space-8:32px; --space-9:36px; --space-10:40px; --space-12:48px; --space-14:56px; --space-16:64px; --space-24:96px; --space-28:112px;
+  /* spacing: --space-N is N x 4px, and only even N are used (DESIGN.md's 8px rhythm) */
+  --space-2:8px; --space-4:16px; --space-6:24px; --space-8:32px; --space-10:40px; --space-12:48px; --space-14:56px;
+  --space-16:64px; --space-24:96px; --space-28:112px;
   /* fluid layout spacing, built from the scale: each grows with the viewport between two steps */
   --space-gutter:clamp(var(--space-4),4vw,var(--space-8));
-  --space-section:clamp(var(--space-14),9vw,var(--space-24));
-  --space-gap-s:clamp(var(--space-2),1.2vw,var(--space-3));
-  --space-gap-m:clamp(var(--space-3),2vw,var(--space-6));
+  --space-section:clamp(var(--space-16),9vw,var(--space-24));   /* a section gets 64px or more above it */
+  --space-gap-s:clamp(var(--space-2),1.2vw,var(--space-4));
+  --space-gap-m:clamp(var(--space-4),2vw,var(--space-6));
   --space-gap-l:clamp(var(--space-6),4vw,var(--space-12));
-  --space-card:clamp(var(--space-4),2.4vw,var(--space-6));
 
   /* typography (DESIGN.md): self-hosted in design/fonts.css. Display is variable but only 200 and 800 are used.
      A stack ends at the generic family: no system fonts in between. */
@@ -28,21 +27,18 @@
   --font-sans:"IBM Plex Sans",sans-serif;
   --font-mono:"IBM Plex Mono",monospace;
   /* the scale: each step 3x the one below. sm is mono meta only (counts, labels); base is body copy and controls;
-     xl the section headings; display the one headline per page. lg and 2xl are interim sizes for card titles and
-     figures until the layout pass moves them onto the scale. */
+     xl the section headings, project names and headline figures; display the one headline per page. */
   --text-sm:13px;
   --text-base:16px;
-  --text-lg:1.15rem;
-  --text-2xl:clamp(1.3rem,1.1rem + 1vw,1.7rem);
   --text-xl:48px;
   --text-display:clamp(64px,14vw,144px);
   --leading-display:1.02; --leading-tight:1.15; --leading-snug:1.4; --leading-body:1.65; --leading-relaxed:1.7;
   --weight-semibold:600; --weight-display:800; --weight-display-light:200;
   --tracking-display:-.035em; --tracking-tight:-.02em; --tracking-snug:-.01em; --tracking-caps:.06em;
 
-  /* shape and motion */
-  --radius-xs:6px; --radius-sm:8px; --radius-md:10px; --radius-lg:14px; --radius-xl:18px; --radius-2xl:20px; --radius-full:999px;
-  --bar-h:60px;
+  /* shape and motion: 4px on controls (buttons, fields, chips) and the dialog, 0 on layout blocks */
+  --radius-control:4px;
+  --bar-h:64px;
   --ease:cubic-bezier(.2,.7,.2,1);
   --duration-fast:.2s; --duration:.3s; --duration-slow:.6s;
 }
@@ -52,7 +48,7 @@
 :where(:root),.theme-dark{
   color-scheme:dark;
   --color-bg:#1D1815;              /* the page behind everything */
-  --color-surface:#27221E;         /* cards, buttons, dialogs */
+  --color-surface:#27221E;         /* the command palette */
   --color-surface-subtle:#302A26;  /* demo frames, skill pills, kbd */
   --color-border:#3D3732;          /* separators and card edges */
   --color-border-strong:#756D67;   /* form fields: 3:1 against bg and surface */
@@ -65,8 +61,7 @@
   --color-text-on-accent:#091F1A;
   --color-danger:#DF7F78;
   --color-scrim:rgba(13,10,8,.6);    /* behind the palette dialog: the bg, darker */
-  --shadow-sm:0 1px 2px rgba(0,0,0,.3),0 16px 36px -18px rgba(0,0,0,.7);
-  --shadow-lg:0 2px 4px rgba(0,0,0,.35),0 26px 48px -20px rgba(0,0,0,.8);
+  --shadow-float:0 2px 4px rgba(0,0,0,.35),0 26px 48px -20px rgba(0,0,0,.8);   /* only what floats: the palette */
   --icon-moon:none; --icon-sun:inline;   /* the toggle shows where it will take you */
 }
 .theme-light{
@@ -85,7 +80,6 @@
   --color-text-on-accent:#F4FCFA;
   --color-danger:#A83634;
   --color-scrim:rgba(42,37,34,.5);   /* text-primary's stone, so the shade stays warm */
-  --shadow-sm:0 1px 2px rgba(42,37,34,.06),0 12px 32px -16px rgba(42,37,34,.25);
-  --shadow-lg:0 2px 4px rgba(42,37,34,.08),0 22px 44px -18px rgba(42,37,34,.35);
+  --shadow-float:0 2px 4px rgba(42,37,34,.08),0 22px 44px -18px rgba(42,37,34,.35);
   --icon-moon:inline; --icon-sun:none;
 }

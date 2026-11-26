@@ -5,8 +5,8 @@
 [![No build step](https://img.shields.io/badge/HTML%20%2B%20CSS-no%20build%20step-blue.svg)](index.html)
 
 Eight projects in one place, each with a live demo that runs in your browser, what it does, what was measured,
-and links to its write-up and source, in one grid you can filter by category; the featured project takes two
-cells, with its case study (problem, approach, result) a click away. Press <kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd> on the site to jump anywhere.
+and links to its write-up and source, in one list you can filter by category, each project's text beside its demo; the featured project leads,
+with its case study (problem, approach, result) a click away. Press <kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd> on the site to jump anywhere.
 
 ### ▶ [Open the portfolio →](https://luke-zhang-cs-py.github.io/)
 
@@ -44,7 +44,7 @@ filter chips from the projects' categories, and the headline test total is added
 
 ```bash
 pip install -r requirements.txt && python -m playwright install chromium
-python tests/check_site.py        # 74 checks in a real browser (--offline skips the 4 that need the network)
+python tests/check_site.py        # 75 checks in a real browser (--offline skips the 4 that need the network)
 python tests/check_site.py --coverage coverage.html   # plus a report of which lines and branches of JS and CSS rules ran
 python -m coverage run -m pytest -q tests && python -m coverage report   # the tools' Python: 100% of lines and branches
 python tools/record_demo.py       # re-record docs/demo.gif from the live site
@@ -54,7 +54,8 @@ python tools/make_og.py           # re-render og.png, the link-preview image
 `check_site.py` covers:
 - every section and project link;
 - that all eight demo GIFs load at their declared sizes;
-- layout at 1280, 820, 390 and 360 px;
+- layout at 1280, 820, 390 and 360 px, the projects as one list with each demo beside its text;
+- DESIGN.md's rules on the rendered page: radius, shadows, display weights, no banned fonts, a left-aligned headline;
 - dark mode and that it's remembered, that the page is themed with JavaScript off, and that a saved theme since removed falls back to dark;
 - that every theme in `THEMES` has a complete token block, and every foreground/background token pairing meets WCAG AA in each;
 - reduced motion;

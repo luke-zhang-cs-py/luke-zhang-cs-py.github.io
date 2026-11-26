@@ -579,6 +579,26 @@ def check_theme(browser):
     return errors + close_page(s)
 
 
+# DESIGN.md's rules, read off every element of the rendered page: the list of what breaks them.
+DESIGN_RULES = r"""() => {
+  const controls = 'button, input, textarea, select, a.btn, .chip, kbd, .skip, dialog', bad = [];
+  const banned = /\b(inter|roboto|open sans|arial|system-ui|-apple-system|segoe ui|helvetica)\b/i;
+  for (const el of document.querySelectorAll('body, body *')) {
+    const s = getComputedStyle(el), name = el.tagName + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).join('.') : '');
+    const radius = Math.max(...[s.borderTopLeftRadius, s.borderTopRightRadius, s.borderBottomLeftRadius, s.borderBottomRightRadius]
+                                .flatMap(v => v.split(' ').map(parseFloat)));
+    if (radius > (el.matches(controls) ? 4 : 0)) bad.push('radius ' + radius + ' on ' + name);
+    if (s.boxShadow !== 'none' && !el.matches('dialog')) bad.push('shadow on ' + name);
+    if (banned.test(s.fontFamily)) bad.push('banned font on ' + name + ': ' + s.fontFamily);
+    if (/bricolage/i.test(s.fontFamily.split(',')[0]) && !['200', '800'].includes(s.fontWeight)) bad.push('display weight ' + s.fontWeight + ' on ' + name);
+  }
+  const h1 = document.querySelector('h1'), wrap = h1.closest('.wrap');
+  const edge = wrap.getBoundingClientRect().left + parseFloat(getComputedStyle(wrap).paddingLeft);
+  if (!['start', 'left'].includes(getComputedStyle(h1).textAlign) || Math.abs(h1.getBoundingClientRect().left - edge) > 1) bad.push('headline not left-aligned');
+  return bad;
+}"""
+
+
 def check_layout(browser):
     errors = []
     for w in WIDTHS[1:]:
@@ -592,19 +612,27 @@ def check_layout(browser):
             m.screenshot(path=SHOTS + "/pf-390.png")
         errors += close_page(m)
     p = open_page(browser, viewport={"width": 1280, "height": 900})
-    grid = p.evaluate("""() => {
-      const g = document.querySelector('#projectList .grid'), cards = [...g.children];
-      const cols = getComputedStyle(g).gridTemplateColumns.split(' ').length;
-      const cells = cards.reduce((n, c) => n + (c.classList.contains('featured') ? 2 : 1), 0);
-      const rows = new Set(cards.map(c => Math.round(c.getBoundingClientRect().top))).size;
-      const f = document.querySelector('.project.featured').getBoundingClientRect(), o = cards[1].getBoundingClientRect();
-      return {cols, cells, rows, wide: Math.round(f.width / o.width * 10) / 10, first: cards[0].id, tall: Math.round(f.height / o.height * 100) / 100};
+    rows = p.evaluate("""() => {
+      const list = document.querySelector('#projectList .list'), items = [...list.children], L = list.getBoundingClientRect();
+      const r = items.map(a => ({box: a.getBoundingClientRect(), body: a.querySelector(':scope > .body').getBoundingClientRect(),
+                                 shot: a.querySelector(':scope > .shot').getBoundingClientRect(), align: getComputedStyle(a.querySelector('h3')).textAlign,
+                                 pad: parseFloat(getComputedStyle(a).paddingTop) + parseFloat(getComputedStyle(a).paddingBottom) + 2}));
+      return {n: items.length, projects: items.every(a => a.matches('article.project')), first: items[0].id,
+              full: r.every(x => Math.abs(x.box.left - L.left) < 1 && Math.abs(x.box.width - L.width) < 1),
+              stacked: r.every((x, i) => !i || x.box.top >= r[i - 1].box.bottom - 1),
+              beside: r.every(x => x.body.right <= x.shot.left + 1 && Math.abs(x.body.left - x.box.left) < 1 && Math.abs(x.body.top - x.shot.top) < 1),
+              left: r.every(x => x.align === 'start' || x.align === 'left'),
+              tight: r.every(x => x.box.height <= Math.max(x.body.height, x.shot.height) + x.pad + 1)};
     }""")
-    check("at 1280 px the projects fill whole rows of three, the transit card taking two cells",
-          grid["cols"] == 3 and grid["cells"] % 3 == 0 and grid["rows"] == grid["cells"] // 3 and grid["wide"] >= 2 and grid["first"] == "transit", grid)
-    check("the transit card is no taller than the card beside it", grid["tall"] <= 1.02, grid)
+    check("at 1280 px the projects are one list, transit first: a row each, every row the list's full width, none overlapping",
+          rows["n"] == DEMOS and rows["projects"] and rows["first"] == "transit" and rows["full"] and rows["stacked"], rows)
+    check("at 1280 px each project's text sits beside its demo, top- and left-aligned, and no row is taller than its content",
+          rows["beside"] and rows["left"] and rows["tight"], rows)
+    broken = p.evaluate(DESIGN_RULES)
+    check("DESIGN.md holds: radius 0 on layout and 4px at most on controls, a shadow only on the dialog, display type at 200 or 800, "
+          "no banned fonts, and the headline left-aligned", not broken, broken[:4])
     if SHOTS:
-        p.locator("#projectList").screenshot(path=SHOTS + "/pf-grid.png")
+        p.locator("#projectList").screenshot(path=SHOTS + "/pf-list.png")
     p.emulate_media(media="print"); p.wait_for_timeout(200)
     check("print leaves out the header, demos and buttons",
           p.evaluate("['.bar', '.shot', '.links'].every(s => getComputedStyle(document.querySelector(s)).display === 'none')"))
@@ -620,7 +648,7 @@ def check_motion(browser):
     names = set(rm.evaluate("[...document.querySelectorAll('.play')].map(b => b.getAttribute('aria-label') || '')"))
     check("reduced motion: no GIF plays by itself, each has a Play button", loaded == 0 and buttons == DEMOS and len(names) == DEMOS and "" not in names,
           "%d loaded, %d buttons, %d distinct names" % (loaded, buttons, len(names)))
-    # A hidden still takes no room: the featured card's demo at two columns is not a tall empty box.
+    # A hidden still takes no room: its frame holds only the Play button, not an empty image box.
     rm.set_viewport_size({"width": 760, "height": 900}); rm.wait_for_timeout(300)
     ghost = rm.evaluate("[...document.querySelectorAll('.shot img[hidden]')].filter(i => i.getBoundingClientRect().height > 0).length")
     check("reduced motion: a hidden demo takes no room at any width", ghost == 0, "%d hidden images still laid out" % ghost)

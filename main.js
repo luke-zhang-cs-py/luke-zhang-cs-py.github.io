@@ -250,7 +250,7 @@ var THEMES = ['dark', 'light'];
   $('who').innerHTML = '<b>' + esc(PROFILE.name) + '</b><span>' + esc(PROFILE.program) + '</span><span>' + esc(PROFILE.school) + '</span>' +
     (PROFILE.status ? '<span class="open">' + esc(PROFILE.status) + '</span>' : '');
   $('bio').innerHTML = PROFILE.bio.map(function (p) { return '<p>' + p + '</p>'; }).join('');
-  $('focus').innerHTML = PROFILE.focus.map(function (f) { return '<li class="card"><b>' + esc(f[0]) + '</b><span>' + esc(f[1]) + '</span></li>'; }).join('');
+  $('focus').innerHTML = PROFILE.focus.map(function (f) { return '<li><b>' + esc(f[0]) + '</b><span>' + esc(f[1]) + '</span></li>'; }).join('');
 
   // ---- the headline figures are counted from the projects, never typed in
   var totalTests = 0;
@@ -269,7 +269,7 @@ var THEMES = ['dark', 'light'];
     [(Math.floor(commits / 10) * 10).toLocaleString('en-US') + '+', 'commits across ' + PROJECTS.length + ' repos', ' data-commits'],
     [totalTests.toLocaleString('en-US'), 'automated tests and checks', ' data-tests-total'],
     ['MIT', 'licensed, CI on every push']
-  ].map(function (s) { return '<div class="card"><b' + (s[2] || '') + '>' + s[0] + '</b><span>' + s[1] + '</span></div>'; }).join('');
+  ].map(function (s) { return '<div><b' + (s[2] || '') + '>' + s[0] + '</b><span>' + s[1] + '</span></div>'; }).join('');
 
   // ---- projects
   function demo(p) {
@@ -277,7 +277,8 @@ var THEMES = ['dark', 'light'];
       '<img src="' + esc(p.gif.src) + '" width="' + p.gif.w + '" height="' + p.gif.h + '" loading="lazy" alt="' + esc(p.gif.alt) + '"></picture>' +
       '<button class="play" type="button" style="--ratio:' + p.gif.w + '/' + p.gif.h + '" aria-label="Play demo: ' + esc(p.title) + '" hidden>▶ Play demo</button></div>';
   }
-  function card(p) {
+  // one row of the list: the project's text, then its demo beside it (below it on a narrow screen)
+  function row(p) {
     var list = function (items, cls, label) { return '<ul class="' + cls + '" aria-label="' + label + '">' + items + '</ul>'; };
     var body = '<p class="meta"><span class="kind">' + esc(p.kind) + '</span><time datetime="' + p.since + '">' + esc(p.dates) + '</time></p>' +
       '<h3 id="h-' + p.id + '">' + esc(p.title) + '</h3><p class="pitch">' + esc(p.summary) + '</p>';
@@ -286,18 +287,17 @@ var THEMES = ['dark', 'light'];
         return '<div><dt>' + c[0] + '</dt><dd>' + esc(c[1]) + '</dd></div>'; }).join('') + '</dl></details>';
     }
     body += '<details class="inside"><summary>What\'s inside</summary><ul>' + p.features.map(function (f) { return '<li>' + esc(f) + '</li>'; }).join('') + '</ul></details>';
-    if (p.featured) body = '<div class="half">' + body + '</div><div class="half">';
     body += list(p.impact.map(function (i) { return '<li>' + i.html + '</li>'; }).join(''), 'impact', 'Results') +
       list(p.tags.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join(''), 'tags', 'Technologies') +
       '<div class="links"><a class="btn primary" href="' + esc(p.demo) + '">Live demo</a>' +
       p.more.map(function (m) { return '<a class="btn" href="' + esc(m.url) + '">' + esc(m.label) + '</a>'; }).join('') +
-      '<a class="btn" href="' + esc(p.source) + '">Source</a></div>' + (p.featured ? '</div>' : '');
+      '<a class="btn" href="' + esc(p.source) + '">Source</a></div>';
     return '<article class="reveal project' + (p.featured ? ' featured' : '') + '" id="' + p.id + '" aria-labelledby="h-' + p.id + '" data-categories="' +
-      esc(p.categories.join('|')) + '">' + demo(p) + '<div class="body">' + body + '</div></article>';
+      esc(p.categories.join('|')) + '"><div class="body">' + body + '</div>' + demo(p) + '</article>';
   }
-  // the featured card leads, so its two cells always start a row (at three across, eight cards fill three rows)
-  $('projectList').innerHTML = '<div class="grid">' + PROJECTS.filter(function (p) { return p.featured; }).concat(
-    PROJECTS.filter(function (p) { return !p.featured; })).map(card).join('') + '</div>';
+  // the featured project leads the list, with its case study
+  $('projectList').innerHTML = '<div class="list">' + PROJECTS.filter(function (p) { return p.featured; }).concat(
+    PROJECTS.filter(function (p) { return !p.featured; })).map(row).join('') + '</div>';
 
   // ---- the category filter
   var categories = [];
@@ -322,7 +322,7 @@ var THEMES = ['dark', 'light'];
 
   // ---- skills
   $('skillList').innerHTML = SKILLS.map(function (s) {
-    return '<div class="skill card"><h3>' + esc(s[0]) + '</h3><ul>' + s[1].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>';
+    return '<div class="skill"><h3>' + esc(s[0]) + '</h3><ul>' + s[1].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>';
   }).join('');
 
   // ---- demo GIFs: <picture> already chose a blank still for visitors who ask for less
